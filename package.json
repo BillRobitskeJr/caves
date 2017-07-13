@@ -2,11 +2,12 @@
   "name": "caves",
   "version": "1.0.0",
   "description": "A browser-based text adventure game engine",
-  "main": "index.js",
+  "main": "./server/index.js",
   "scripts": {
     "install": "npm run build",
     "pretest": "npm run buildtests",
     "test": "mocha \"testLib/**/*.test.js\"",
+    "start": "node .",
     "build": "npm run buildserver && npm run buildclient",
     "prebuildclient": "rm -rf ./client",
     "buildclient": "npm run buildclientjs && npm run buildclientcss",
