@@ -57,6 +57,9 @@ typings/
 # dotenv environment variables file
 .env
 
+# PhantomJS
+phantomjs.exe
+
 # Built project files
 /client
 /server

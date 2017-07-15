@@ -6,7 +6,7 @@
   "scripts": {
     "install": "npm run build",
     "pretest": "npm run buildtests",
-    "test": "mocha \"testLib/**/*.test.js\"",
+    "test": "npm run testserver && npm run testclient",
     "start": "node .",
     "build": "npm run buildserver && npm run buildclient",
     "prebuildclient": "rm -rf ./client",
@@ -19,7 +19,9 @@
     "prebuildtests": "rm -rf ./testLib",
     "buildtests": "tsc --project test.tsconfig.json",
     "prebuilddocs": "rm -rf ./docs",
-    "builddocs": "typedoc --out docs --excludePrivate"
+    "builddocs": "typedoc --out docs --excludePrivate",
+    "testclient": "phantomjs ./test/client/Client.test.js",
+    "testserver": "mocha \"testLib/**/server/**/*.test.js\""
   },
   "repository": {
     "type": "git",
