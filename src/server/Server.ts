@@ -3,6 +3,9 @@
  */
 import * as express from 'express';
 import * as http from 'http';
+import * as bodyParser from 'body-parser';
+
+import CommandsRoute from './CommandsRoute';
 
 /**
  * Server class
@@ -11,6 +14,7 @@ export default class Server {
   private _port: number;
   private _app: express.Application;
   private _server: http.Server;
+  private _commandsRoute: CommandsRoute;
 
   /**
    * Build a new server instance
@@ -19,7 +23,10 @@ export default class Server {
   constructor(port: number = 3000) {
     this._port = port;
     this._app = express();
+    this._commandsRoute = new CommandsRoute();
+    this.setupBodyParser();
     this.setupClientHost();
+    this.setupRoutes();
   }
 
   /**
@@ -34,6 +41,14 @@ export default class Server {
    */
   protected setupClientHost() {
     this._app.use('/', express.static(Server.clientDir));
+  }
+
+  protected setupRoutes() {
+    this._app.use('/api/commands', this._commandsRoute.router);
+  }
+
+  protected setupBodyParser() {
+    this._app.use(bodyParser.json({ type: 'application/vnd.api+json' }));
   }
 
   /**

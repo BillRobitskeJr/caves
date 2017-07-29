@@ -9,7 +9,12 @@
     /* Strict Type-Checking Options */
     "strict": true,
     "noImplicitAny": true,
-    "noImplicitThis": true
+    "noImplicitThis": true,
+
+    "typeRoots": [
+      "./node_modules/@types",
+      "./typings"
+    ]
   },
   "include": [
     "./src/**/*"
