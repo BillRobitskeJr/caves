@@ -59,7 +59,8 @@ export default class Terminal {
     console.log(`Command entered: ${command}`);
     this.echoCommand(command);
     // FOR TESTING
-    this.postOutput(`I don't know how to perform "${command}".  Blame Bill.`, 'server');
+    // this.postOutput(`I don't know how to perform "${command}".  Blame Bill.`, 'server');
+    this.sendCommandToServer(command);
   }
 
   /**
@@ -83,5 +84,35 @@ export default class Terminal {
     const output = this._element.querySelector('.output');
     if (!output) return;
     output.insertBefore(outblock, output.firstChild);
+  }
+
+  sendCommandToServer(command: string) {
+    const body = JSON.stringify({
+      data: {
+        type: 'commands',
+        properties: {
+          rawCommand: command
+        }
+      }
+    });
+    const options = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/vnd.api+json',
+        'Accept': 'application/vnd.api+json'
+      },
+      body
+    };
+    fetch('/api/commands', options).then(res => res.json()).then(res => {
+      if (res.data
+          && res.data.relationships
+          && res.data.relationships.response
+          && res.included) {
+        const response = res.included.find((resource: any) => resource.type === res.data.relationships.response.type && resource.id === res.data.relationships.response.id);
+        this.postOutput(response.properties.textResponse, 'server');
+      } else {
+        this.postOutput('But nobody cared...', 'info');
+      }
+    });
   }
 }
