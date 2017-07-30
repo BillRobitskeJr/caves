@@ -1,12 +1,15 @@
 import { Router } from 'express';
 
 import Command from './model/Command';
+import Interpreter from './interpreter/Interpreter';
 
 export default class CommandsRoute {
   private _router: Router;
+  private _interpreter: Interpreter;
 
   constructor() {
     this._router = Router();
+    this._interpreter = new Interpreter();
     this.setupRoutes();
   }
 
@@ -23,6 +26,7 @@ export default class CommandsRoute {
         const command = new Command({
           rawCommand: req.body.data.properties.rawCommand
         });
+        const commandResponse = this._interpreter.processCommand(command);
         const response = new Buffer(JSON.stringify({
           data: {
             id: `${command.timestamp.toISOString()}`,
@@ -32,8 +36,24 @@ export default class CommandsRoute {
               action: command.action,
               target: command.target,
               timestamp: command.timestamp.toISOString()
+            },
+            relationships: {
+              response: {
+                id: `${commandResponse.timestamp.toISOString()}`,
+                type: 'responses'
+              }
             }
-          }
+          },
+          included: [
+            {
+              id: `${commandResponse.timestamp.toISOString()}`,
+              type: 'responses',
+              properties: {
+                textResponse: commandResponse.textResponse,
+                timestamp: commandResponse.timestamp.toISOString()
+              }
+            }
+          ]
         }));
         res.status(201).contentType('application/vnd.api+json').send(response);
       });

@@ -78,7 +78,7 @@ describe('/api/commands route', function() {
       });
       it('should responded with an included "responses" resource', function() {
         expect(this.responseData.data).to.have.property('relationships').that.is.an('object');
-        expect(this.responseData.data.relationships).to.have.property('response').that.is.an('oject');
+        expect(this.responseData.data.relationships).to.have.property('response').that.is.an('object');
         expect(this.responseData.data.relationships.response).to.have.property('id').that.is.a('string');
         expect(this.responseData.data.relationships.response).to.have.property('type').that.equals('responses');
         expect(this.responseData).to.have.property('included').that.is.an('array');
