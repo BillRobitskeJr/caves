@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>The Quest</title>
+    <script src="./elements/brj-terminal.js"></script>
+    <script mode="module">
+      window.addEventListener('load', () => {
+        const main = document.getElementById('main-screen');
+        const room = document.getElementById('room-display');
+        const inventory = document.getElementById('inventory-display');
+
+        main.clear();
+        main.print(`                        ~~~ THE QUEST ~~~
+All your life, you had heard the stories of your crazy Uncle
+Simon.  He was an inventor who kept disappearing for long
+periods of time, never telling anyone where he had been.
+
+You never believed the stories, but when your uncle died and
+left you his diary, you learned that they were true.  Your
+uncle had discovered a magic land and a secret formula that
+could take him there.  In that land was a magic ruby, and
+his diary contained the instructions for going there to find
+it.`);
+        main.print(`Press Return to begin...`);
+
+        room.clear();
+        room.print(`You are in your living room.
+You can go: north, south, east
+You can see:
+   a diary
+   a small box`);
+
+        inventory.clear();
+        inventory.print(`You are holding:
+   nothing
+You can carry 5 more.`);
+      });
+    </script>
+    <style>
+      html, body {
+        background: black;
+      }
+      @font-face {
+        font-family: "Another Mans Treasure MIII 64C";
+        src: url("AnotherMansTreasureMIII64C.ttf");
+      }
+      .trs80 {
+        --terminal-font: "Another Mans Treasure MIII 64C";
+        --terminal-character-box-ratio: calc(1 / 3);
+        --terminal-columns: 64;
+        --terminal-rows: 16;
+        --terminal-foreground-color: white;
+      }
+
+      #game-interface {
+        display: flex;
+      }
+      #game-interface .auxilerty-interfaces {
+        display: flex;
+        flex-direction: column;
+      }
+      #game-interface .screen {
+        border: 1px solid white;
+      }
+      
+      #main-screen {
+        font-size: 2em;
+      }
+
+      body > footer {
+        color: white;
+        font-family: monospace;
+        font-size: small;
+      }
+      body > footer p {
+        margin: 0;
+        text-align: center;
+      }
+      body > footer p a {
+        color: inherit;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="game-interface">
+      <div class="screen main"><brj-terminal id="main-screen" class="trs80" echo></brj-terminal></div>
+      <div class="auxilery">
+        <div class="screen"><brj-terminal id="room-display" class="trs80" output-only top-down></brj-terminal></div>
+        <div class="screen"><brj-terminal id="inventory-display" class="trs80" output-only top-down></brj-terminal></div>
+      </div>
+    </div>
+    <footer>
+      <p>Copyright &copy; Bill Robitske, Jr. 2018 - <a title="LICENSE" href="https://github.com/DigitalMugen/caves/blob/master/LICENSE">MIT License</a></p>
+      <p><a title="TRS-80 Fonts" href="http://www.kreativekorp.com/software/fonts/trs80.shtml">Another Mans Treasure font</a> by Kreative Korporation - Used under <a title="Relay Fonts" href="http://www.kreativekorp.com/software/fonts/index.shtml#retro">Free Use License</a></p>
+      <p>Example text based on "The Quest" from <a title="How to Create Adventure Games (Computer Awareness First Books): Christopher Limpton: 9780531101193: Amazon.com: Books" href="https://www.amazon.com/Create-Adventure-Games-Computer-Awareness/dp/0531101193">How to Create Adventure Games</a>, Christopher Lampton (1986) - Used under fair use</p>
+    </footer>
+  </body>
+</html>
