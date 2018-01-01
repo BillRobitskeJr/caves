@@ -59,8 +59,3 @@ jspm_packages/
 
 # PhantomJS
 phantomjs.exe
-
-# Built project files
-/client
-/server
-/testLib
