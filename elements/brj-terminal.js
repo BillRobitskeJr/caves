@@ -153,7 +153,7 @@ class BRJTerminalElement extends HTMLElement {
     const output = document.createDocumentFragment();
     message.split(/\n/g).forEach(line => {
       const pre = document.createElement('pre');
-      pre.innerHTML = line;
+      pre.innerHTML = line || '&nbsp;';
       if (style) pre.setAttribute('data-style', style);
       output.appendChild(pre);
     });
@@ -172,11 +172,12 @@ class BRJTerminalElement extends HTMLElement {
    * Focus on this terminal's input prompt
    */
   focus() {
+    console.log(`BRJTerminalElement#focus`, this);
     if (!this.outputOnly) this.shadowRoot.querySelector('input').focus();
   }
 
   /**
-   * @event   BRJTerminalElement~input
+   * @event   BRJTerminalElement~command
    * @param   {BRJTerminalElement}  target  - Terminal receiving the input
    * @param   {object}       detail         - Input event details
    * @param   {string}       detail.input   - Input provided
@@ -187,14 +188,14 @@ class BRJTerminalElement extends HTMLElement {
    * event if it did
    * @private
    * @param   {KeyboardEvent} event
-   * @fires   BRJTerminalElement~input
+   * @fires   BRJTerminalElement~command
    */
   _handleInput(event) {
     if (event.keyCode === 13) {
       const input = event.target.value;
       event.target.value = '';
       if (this.echo) this.print(input);
-      this.dispatchEvent(new CustomEvent('input', { detail: {
+      this.dispatchEvent(new CustomEvent('command', { detail: {
         input: input
       }}));
     }

@@ -3,37 +3,28 @@
   <head>
     <title>The Quest</title>
     <script src="./elements/brj-terminal.js"></script>
-    <script mode="module">
+    <script type="module">
+      import GameEngine from './engine/core.js';
+
+      import gameConfig from './game/game.js';
+
       window.addEventListener('load', () => {
-        const main = document.getElementById('main-screen');
-        const room = document.getElementById('room-display');
-        const inventory = document.getElementById('inventory-display');
+        const mainScreen = document.getElementById('main-screen');
 
-        main.clear();
-        main.print(`                        ~~~ THE QUEST ~~~
-All your life, you had heard the stories of your crazy Uncle
-Simon.  He was an inventor who kept disappearing for long
-periods of time, never telling anyone where he had been.
+        // Construct game
+        const game = new GameEngine({
+          output: mainScreen,
+          roomOutput: document.getElementById('room-display'),
+          inventoryOutput: document.getElementById('inventory-display'),
+          game: gameConfig
+        });
+        mainScreen.addEventListener('command', (event) => {
+          game.handleInput(event.detail.input);
+        });
+        mainScreen.focus();
 
-You never believed the stories, but when your uncle died and
-left you his diary, you learned that they were true.  Your
-uncle had discovered a magic land and a secret formula that
-could take him there.  In that land was a magic ruby, and
-his diary contained the instructions for going there to find
-it.`);
-        main.print(`Press Return to begin...`);
-
-        room.clear();
-        room.print(`You are in your living room.
-You can go: north, south, east
-You can see:
-   a diary
-   a small box`);
-
-        inventory.clear();
-        inventory.print(`You are holding:
-   nothing
-You can carry 5 more.`);
+        // Start game
+        game.startGame();
       });
     </script>
     <style>
@@ -78,6 +69,10 @@ You can carry 5 more.`);
       }
       body > footer p a {
         color: inherit;
+      }
+
+      brj-terminal [data-style="story"] {
+        color: palegoldenrod;
       }
     </style>
   </head>
