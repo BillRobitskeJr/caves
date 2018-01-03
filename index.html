@@ -7,6 +7,9 @@
       import GameEngine from './engine/core.js';
 
       import gameConfig from './game/game.js';
+      import playerConfig from './game/player.js';
+      import locationsConfig from './game/locations.js';
+      import objectsConfig from './game/objects.js';
 
       window.addEventListener('load', () => {
         const mainScreen = document.getElementById('main-screen');
@@ -16,7 +19,10 @@
           output: mainScreen,
           roomOutput: document.getElementById('room-display'),
           inventoryOutput: document.getElementById('inventory-display'),
-          game: gameConfig
+          game: gameConfig,
+          player: playerConfig,
+          locations: locationsConfig,
+          objects: objectsConfig
         });
         mainScreen.addEventListener('command', (event) => {
           game.handleInput(event.detail.input);
