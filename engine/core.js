@@ -100,11 +100,12 @@ export default class EngineCore {
   _displayRoom() {
     console.log(`EngineCore#_displayRoom`, this._locationEntities, this._playerEntity);
     const room = this._locationEntities.getItem(this._playerEntity.state.room) || new Entity();
+    const exits = (room.state.exits || []).map(exit => exit.direction).join(', ');
     const objects = this._objectEntities.getItemsByState({ room: room.id }).map(object => `   ${object.name}`).join('\n');
     console.log(`EngineCore#_displayRoom~objects`, objects);
     this._roomOutput.clear();
     this._roomOutput.print(`You are ${room.name || 'nowhere'}.`);
-    this._roomOutput.print(`You can go: ${null || 'nowhere'}`);
+    this._roomOutput.print(`You can go: ${exits || 'nowhere'}`);
     this._roomOutput.print(`You can see:`);
     this._roomOutput.print(`${objects || '   nothing of interest'}`);
   }
