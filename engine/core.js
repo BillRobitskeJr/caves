@@ -59,6 +59,9 @@ export default class EngineCore {
     this._objectEntities = new Collection(config.objects, Entity);
   }
 
+  /**
+   * Start the game
+   */
   startGame() {
     console.log(`EngineCore#startGame()`);
     this._output.clear();
@@ -70,6 +73,10 @@ export default class EngineCore {
     this._displayOpening();
   }
 
+  /**
+   * Perform the player's turn based on their input
+   * @param   {string}  input - Player-entered command
+   */
   handleInput(input) {
     console.log(`EngineCore#handleInput("${input}")`);
     switch (this._engineState) {
@@ -101,13 +108,9 @@ export default class EngineCore {
     } 
   }
 
-  static get defaultOutput() {
-    return {
-      output: console.log.bind(console),
-      clear: console.clear.bind(console)
-    };
-  }
-
+  /**
+   * Display a page of the game's opening
+   */
   _displayOpening() {
     console.log(`EngineCore#_displayOpening()`);
     let page = this._gameEntity.state.openingPage;
@@ -116,6 +119,9 @@ export default class EngineCore {
     this._gameEntity.updateState({ openingPage: ++page });
   }
 
+  /**
+   * Display the current room in the room display
+   */
   _displayRoom() {
     console.log(`EngineCore#_displayRoom()`);
     const room = this._locationEntities.getItem(this._playerEntity.state.room) || new Entity();
@@ -128,6 +134,9 @@ export default class EngineCore {
     this._roomOutput.print(`${objects || '   nothing of interest'}`);
   }
 
+  /**
+   * Display the player's inventory in the inventory display
+   */
   _displayInventory() {
     console.log(`EngineCore#_displayInventory()`);
     const maxCarry = this._playerEntity.identity.maxCarry || 0;
