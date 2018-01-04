@@ -16,5 +16,6 @@ there.  In that land was a magic ruby, and his diary contained
 instructions for going there to find it.`
     ]
   },
-  actions: {}
+  actions: {
+  }
 }

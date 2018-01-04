@@ -32,4 +32,16 @@ export default class Entity {
 
   get actions() { return this._actions; }
   get reactions() { return this._reactions; }
+
+  clone() {
+    return new Entity({
+      id: this._id,
+      name: this._name,
+      tag: this._tag,
+      identity: this._identity,
+      state: this._state,
+      actions: this._actions,
+      reactions: this._reactions
+    });
+  }
 }
