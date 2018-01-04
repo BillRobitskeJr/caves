@@ -94,7 +94,7 @@ export default class Action {
     // if (changes.abort) return changes;
 
     // Perform action and gather state changes
-    changes = Object.assign(changes, this._action(output, location, object, game, player, locations, objects));
+    changes = Object.assign(changes, this._action(output, command, location, object, game, player, locations, objects));
     if (_game.actions.hasOwnProperty(primaryTag)) changes = Object.assign(changes, _game.actions[primaryTag](output, command, location, object, game, player, locations, objects));
     if (_player.actions.hasOwnProperty(primaryTag)) changes = Object.assign(changes, _game.actions[primaryTag](output, command, location, object, game, player, locations, objects));
     if (_location && _location.actions.hasOwnProperty(primaryTag)) changes = Object.assign(changes, _game.actions[primaryTag](output, command, location, object, game, player, locations, objects));

@@ -8,7 +8,7 @@
 export default [
   {
     tags: ['get', 'take'],
-    action: (output, location, object, game, player, locations, objects) => {
+    action: (output, command, location, object, game, player, locations, objects) => {
       if (!object) return output.print(`You can't get that!`, 'error');
       if (player.state.inventory.indexOf(object.id) !== -1) return output.print(`You're already carrying it!`, 'error');
       if (object.state.room !== location.id) return output.print(`It's not here!`, 'error');
@@ -29,7 +29,7 @@ export default [
   },
   {
     tag: 'drop',
-    action: (output, location, object, game, player, locations, objects) => {
+    action: (output, command, location, object, game, player, locations, objects) => {
       if (!object) return output.print(`You can't drop that!`, 'error');
       const index = player.state.inventory.indexOf(object.id);
       if (index === -1) return output.print(`You don't have it!`, 'error');
@@ -44,6 +44,20 @@ export default [
         player: { inventory },
         objects: objectsChanges
       }
+    }
+  },
+  {
+    tag: 'go',
+    action: (output, command, location, object, game, player, locations, objects) => {
+      if (!location || !location.state.exits) return output.print(`You can't go there!`, 'error');
+      const exit = location.state.exits.find(exit => exit.direction === command.object);
+      if (!exit || !exit.destination) return output.print(`You can't go there!`, 'error');
+
+      output.print(`You head ${exit.direction}.`, 'story');
+
+      return {
+        player: { room: exit.destination }
+      };
     }
   }
 ]

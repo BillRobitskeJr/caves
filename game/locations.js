@@ -30,7 +30,7 @@ export default [
     state: {
       exits: [
         { direction: 'south', destination: 1 },
-        { direction: 'west', detination: 5 }
+        { direction: 'west', destination: 5 }
       ]
     }
   },
