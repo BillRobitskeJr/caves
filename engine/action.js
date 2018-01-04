@@ -77,21 +77,25 @@ export default class Action {
     const _objects = objects.clone();
     const _location = location ? _locations.getItem(location.id) : null;
     const _object = object ? _objects.getItem(object.id) : null;
+    const _localObjects = _objects.getItemsByState({ room: _location.id });
     
     let changes = {};
     
     // Perform "pre-action" and gather state changes
-    // if (_game.preactions.hasOwnProperty(primaryTag)) changes = Object.assign(changes, _game.preActions[primaryTag](output, command, location, object, game, player, locations, objects));
-    // if (_player.preactions.hasOwnProperty(primaryTag)) changes = Object.assign(changes, _game.preActions[primaryTag](output, command, location, object, game, player, locations, objects));
-    // if (_location && _location.preactions.hasOwnProperty(primaryTag)) changes = Object.assign(changes, _game.preActions[primaryTag](output, command, location, object, game, player, locations, objects));
-    // if (_object && _object.preactions.hasOwnProperty(primaryTag)) changes = Object.assign(changes, _game.preActions[primaryTag](output, command, location, object, game, player, locations, objects));
+    if (_game.preactions.hasOwnProperty(primaryTag)) changes = Object.assign(changes, _game.preActions[primaryTag](output, command, location, object, game, player, locations, objects));
+    if (_player.preactions.hasOwnProperty(primaryTag)) changes = Object.assign(changes, _game.preActions[primaryTag](output, command, location, object, game, player, locations, objects));
+    if (_location && _location.preactions.hasOwnProperty(primaryTag)) changes = Object.assign(changes, _game.preActions[primaryTag](output, command, location, object, game, player, locations, objects));
+    if (_object && _object.preactions.hasOwnProperty(primaryTag)) changes = Object.assign(changes, _game.preActions[primaryTag](output, command, location, object, game, player, locations, objects));
+    _localObjects.forEach(_localObject => {
+      if (_localObject.preactions.hasOwnProperty(primaryTag)) changes = Object.assign(changes, _localObject.preactions[primaryTag](output, command, location, object, game, player, locations, objects));
+    });
     
     // Apply "pre-action" state changes
-    // _game.updateState(changes.game || {});
-    // _player.updateState(changes.player || {});
-    // _locations.updateStates(changes.locations || {});
-    // _objects.updateStates(changes.objects || {});
-    // if (changes.abort) return changes;
+    _game.updateState(changes.game || {});
+    _player.updateState(changes.player || {});
+    _locations.updateStates(changes.locations || {});
+    _objects.updateStates(changes.objects || {});
+    if (changes.abort) return changes;
 
     // Perform action and gather state changes
     changes = Object.assign(changes, this._action(output, command, location, object, game, player, locations, objects));
@@ -111,7 +115,7 @@ export default class Action {
     if (_player.reactions.hasOwnProperty(primaryTag)) changes = Object.assign(changes, _game.postActions[primaryTag](output, command, location, object, game, player, locations, objects));
     if (_location && _location.reactions.hasOwnProperty(primaryTag)) changes = Object.assign(changes, _game.postActions[primaryTag](output, command, location, object, game, player, locations, objects));
     if (_object && _object.reactions.hasOwnProperty(primaryTag)) changes = Object.assign(changes, _game.postActions[primaryTag](output, command, location, object, game, player, locations, objects));
-
+    
     return changes;
   }
 }

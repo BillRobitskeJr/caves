@@ -66,7 +66,18 @@ export default [
     id: 13, name: 'a magic fan', tag: 'fan'
   },
   {
-    id: 14, name: 'a nasty-looking guard', tag: 'guard'
+    id: 14, name: 'a nasty-looking guard', tag: 'guard',
+    state: {
+      room: 16
+    },
+    preactions: {
+      go: (output, command, location, game, player, locations, objects) => {
+        if (command.object === 'north') {
+          output.print(`The guard blocks your path!`, 'story');
+          return { abort: true };
+        }
+      }
+    }
   },
   {
     id: 15, name: 'a glass case', tag: 'case'

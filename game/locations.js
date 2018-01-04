@@ -70,13 +70,29 @@ export default [
     id: 14, name: 'on the north bank of a river'
   },
   {
-    id: 15, name: 'on a well-traveled road'
+    id: 15, name: 'on a well-traveled road',
+    state: {
+      exits: [
+        { direction: 'north', destination: 16 }
+      ]
+    }
   },
   {
-    id: 16, name: 'in front of a large castle'
+    id: 16, name: 'in front of a large castle',
+    state: {
+      exits: [
+        { direction: 'north', destination: 17 },
+        { direction: 'south', destination: 15 }
+      ]
+    }
   },
   {
-    id: 17, name: 'in a narrow hall'
+    id: 17, name: 'in a narrow hall',
+    state: {
+      exits: [
+        { direction: 'south', destination: 16 }
+      ]
+    }
   },
   {
     id: 18, name: 'in a large hall'
