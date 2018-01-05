@@ -77,32 +77,17 @@ export default class Action {
     const _objects = objects.clone();
     const _location = location ? _locations.getItem(location.id) : null;
     const _object = object ? _objects.getItem(object.id) : null;
+    const _carriedObjects = _player.state.inventory.map(_carriedObject => _objects.getItem(_carriedObject));
     const _localObjects = _objects.getItemsByState({ room: _location.id });
     
     let changes = {};
     
-    // Perform "pre-action" and gather state changes
-    if (_game.preactions.hasOwnProperty(primaryTag)) changes = Object.assign(changes, _game.preActions[primaryTag](output, command, location, object, game, player, locations, objects));
-    if (_player.preactions.hasOwnProperty(primaryTag)) changes = Object.assign(changes, _game.preActions[primaryTag](output, command, location, object, game, player, locations, objects));
-    if (_location && _location.preactions.hasOwnProperty(primaryTag)) changes = Object.assign(changes, _game.preActions[primaryTag](output, command, location, object, game, player, locations, objects));
-    if (_object && _object.preactions.hasOwnProperty(primaryTag)) changes = Object.assign(changes, _game.preActions[primaryTag](output, command, location, object, game, player, locations, objects));
-    _localObjects.forEach(_localObject => {
-      if (_localObject.preactions.hasOwnProperty(primaryTag)) changes = Object.assign(changes, _localObject.preactions[primaryTag](output, command, location, object, game, player, locations, objects));
-    });
-    
-    // Apply "pre-action" state changes
-    _game.updateState(changes.game || {});
-    _player.updateState(changes.player || {});
-    _locations.updateStates(changes.locations || {});
-    _objects.updateStates(changes.objects || {});
-    if (changes.abort) return changes;
-
     // Perform action and gather state changes
-    changes = Object.assign(changes, this._action(output, command, location, object, game, player, locations, objects));
-    if (_game.actions.hasOwnProperty(primaryTag)) changes = Object.assign(changes, _game.actions[primaryTag](output, command, location, object, game, player, locations, objects));
-    if (_player.actions.hasOwnProperty(primaryTag)) changes = Object.assign(changes, _game.actions[primaryTag](output, command, location, object, game, player, locations, objects));
-    if (_location && _location.actions.hasOwnProperty(primaryTag)) changes = Object.assign(changes, _game.actions[primaryTag](output, command, location, object, game, player, locations, objects));
-    if (_object && _object.actions.hasOwnProperty(primaryTag)) changes = Object.assign(changes, _game.actions[primaryTag](output, command, location, object, game, player, locations, objects));
+    changes = Object.assign(changes, this._action(output, command, _location, _object, _game, _player, _locations, _objects));
+    if (_game.actions.hasOwnProperty(primaryTag)) changes = Object.assign(changes, _game.actions[primaryTag](output, command, _location, _object, _game, _player, _locations, _objects));
+    if (_player.actions.hasOwnProperty(primaryTag)) changes = Object.assign(changes, _player.actions[primaryTag](output, command, _location, _object, _game, _player, _locations, _objects));
+    if (_location && _location.actions.hasOwnProperty(primaryTag)) changes = Object.assign(changes, _location.actions[primaryTag](output, command, _location, _object, _game, _player, _locations, _objects));
+    if (_object && _object.actions.hasOwnProperty(primaryTag)) changes = Object.assign(changes, _object.actions[primaryTag](output, command, _location, _object, _game, _player, _locations, _objects));
     
     // Apply "action" state changes
     _game.updateState(changes.game || {});
@@ -111,10 +96,17 @@ export default class Action {
     _objects.updateStates(changes.objects || {});
     if (changes.abort) return changes;
 
-    if (_game.reactions.hasOwnProperty(primaryTag)) changes = Object.assign(changes, _game.postActions[primaryTag](output, command, location, object, game, player, locations, objects));
-    if (_player.reactions.hasOwnProperty(primaryTag)) changes = Object.assign(changes, _game.postActions[primaryTag](output, command, location, object, game, player, locations, objects));
-    if (_location && _location.reactions.hasOwnProperty(primaryTag)) changes = Object.assign(changes, _game.postActions[primaryTag](output, command, location, object, game, player, locations, objects));
-    if (_object && _object.reactions.hasOwnProperty(primaryTag)) changes = Object.assign(changes, _game.postActions[primaryTag](output, command, location, object, game, player, locations, objects));
+    // Perform reactions and gather state changes
+    if (_game.reactions.hasOwnProperty(primaryTag)) changes = Object.assign(changes, _game.postActions[primaryTag](output, command, _location, _object, _game, _player, _locations, _objects));
+    if (_player.reactions.hasOwnProperty(primaryTag)) changes = Object.assign(changes, _player.postActions[primaryTag](output, command, _location, _object, _game, _player, _locations, _objects));
+    if (_location && _location.reactions.hasOwnProperty(primaryTag)) changes = Object.assign(changes, _location.postActions[primaryTag](output, command, _location, _object, _game, _player, _locations, _objects));
+    if (_object && _object.reactions.hasOwnProperty(primaryTag)) changes = Object.assign(changes, _object.postActions[primaryTag](output, command, _location, _object, _game, _player, _locations, _objects));
+    _carriedObjects.forEach(_carriedObject => {
+      if (_carriedObject !== _object && _carriedObject.reactions.hasOwnProperty(primaryTag)) changes = Object.assign(changes, _carriedObject.reactions[primaryTag](output, command, _location, _object, _game, _player, _locations, _objects));
+    });
+    _localObjects.forEach(_localObject => {
+      if (_localObject !== _object && _localObject.reactions.hasOwnProperty(primaryTag)) changes = Object.assign(changes, _localObject.reactions[primaryTag](output, command, _location, _object, _game, _player, _locations, _objects));
+    });
     
     return changes;
   }

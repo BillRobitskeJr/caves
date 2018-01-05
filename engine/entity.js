@@ -29,7 +29,6 @@ export default class Entity {
     this._identity = Object.assign({}, config.identity || {});
     this._state = Object.assign({}, config.state || {});
 
-    this._preactions = Object.assign({}, config.preactions || {});
     this._actions = Object.assign({}, config.actions || {});
     this._reactions = Object.assign({}, config.reactions || {});
   }
@@ -71,12 +70,6 @@ export default class Entity {
   updateState(patch) { this._state = Object.assign({}, this.state, patch); }
 
   /**
-   * @property  {Object.<string, Action~callback>}  preactions  - Pre-actions related to this entity
-   * @readonly
-   */
-  get preactions() { return this._preactions; }
-
-  /**
    * @property  {Object.<string, Action~callback>}  actions   - Actions related to this entity
    * @readonly
    */
@@ -99,7 +92,6 @@ export default class Entity {
       tag: this._tag,
       identity: this._identity,
       state: this._state,
-      preactions: this._preactions,
       actions: this._actions,
       reactions: this._reactions
     });

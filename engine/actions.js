@@ -59,5 +59,51 @@ export default [
         player: { room: exit.destination }
       };
     }
+  },
+  {
+    tag: 'enter',
+    action: (output, command, location, object, game, player, locations, objects) => {
+      if (!object || !object.state.isEnterable) {
+        output.print(`You can't enter that!`, 'error');
+        return { abort: true };
+      }
+      const destination = locations.getItem(object.state.enterDestination);
+      if (!destination) {
+        output.print(`It doesn't seem to lead anywhere...`, 'story');
+        return { abort: true };
+      }
+
+      output.print(object.state.enterTransition || `You enter ${object.name}.`, 'story');
+
+      return {
+        player: { room: destination.id }
+      }
+    }
+  },
+  {
+    tag: 'leave',
+    action: (output, command, location, object, game, player, locations, objects) => {
+      if (!location.state.isLeavable) {
+        output.print(`You can't leave here!`, 'error');
+        return { abort: true };
+      }
+      const destinationObject = objects.getItem(location.state.leaveDestinationObject);
+      if (!destinationObject || !destinationObject.state.room) {
+        output.print(`...and go where?`, 'story');
+        return { abort: true };
+      }
+
+      output.print(location.state.leaveTransition || `You leave ${destinationObject.name}.`, 'story');
+
+      return {
+        player: { room: destinationObject.state.room }
+      }
+    }
+  },
+  {
+    tag: 'jump',
+    action: (output, command, location, object, game, player, locations, objects) => {
+      output.print(`You jump into the air!`, 'story');
+    }
   }
 ]

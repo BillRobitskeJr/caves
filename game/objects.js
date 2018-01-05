@@ -54,38 +54,78 @@ export default [
     }
   },
   {
-    id: 10, name: 'a tree', tag: 'tree'
+    id: 10, name: 'a tree', tag: 'tree',
+    identity: {
+      isFixed: true
+    },
+    state: {
+      room: 7
+    },
+    reactions: {
+      'jump': (output, command, location, object, game, player, locations, objects) => {
+        output.print(`You grab onto a bottom limb of the tree, and pull yourself up.`, 'story');
+        return {
+          player: { room: 8 }
+        }
+      }
+    }
   },
   {
     id: 11, name: 'a golden sword', tag: 'sword'
   },
   {
-    id: 12, name: 'a wooden boat', tag: 'boat'
+    id: 12, name: 'a wooden boat', tag: 'boat',
+    identity: {
+      isFixed: true
+    },
+    state: {
+      room: 12,
+      isEnterable: true,
+      enterDestination: 13,
+      enterTransition: 'You climb into the boat.'
+    }
   },
   {
-    id: 13, name: 'a magic fan', tag: 'fan'
+    id: 13, name: 'a magic fan', tag: 'fan',
+    state: {
+      room: 8
+    }
   },
   {
     id: 14, name: 'a nasty-looking guard', tag: 'guard',
     state: {
       room: 16
     },
-    preactions: {
+    reactions: {
       go: (output, command, location, game, player, locations, objects) => {
         if (command.object === 'north') {
-          output.print(`The guard blocks your path!`, 'story');
-          return { abort: true };
+          output.print(`The guard stops you!`, 'story');
+          return {
+            abort: true,
+            player: {
+              location: location.id
+            }
+          };
         }
       }
     }
   },
   {
-    id: 15, name: 'a glass case', tag: 'case'
+    id: 15, name: 'a glass case', tag: 'case',
+    identity: {
+      isFixed: true
+    },
+    state: {
+      room: 18
+    }
   },
   {
     id: 16, name: 'a glowing ruby', tag: 'ruby'
   },
   {
-    id: 17, name: 'a pair of rubber gloves', tag: 'gloves'
+    id: 17, name: 'a pair of rubber gloves', tag: 'gloves',
+    state: {
+      room: 19
+    }
   }
 ]
