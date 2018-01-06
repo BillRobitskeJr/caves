@@ -66,6 +66,31 @@ export default [
       exits: [
         { direction: 'down', destination: 7 }
       ]
+    },
+    actions: {
+      climb: (output, command, location, object, game, player, locations, objects) => {
+        if (!!command.object && command.object !== 'tree') return { abort: true };
+        output.print(`You carefully make your way up the tree, moving from limb to`, 'story');
+        output.print(`limb, until finally reaching its top.`, 'story');
+        return {
+          player: { room: 19 },
+          locations: {
+            8: {
+              exits: location.state.exits.concat({ direction: 'up', destination: 19 })
+            }
+          }
+        }
+      }
+    },
+    reactions: {
+      jump: (output, command, location, object, game, player, locations, objects) => {
+        output.print(`...and miss the limb on the way back down!`, 'story');
+        output.print(`You land hard, everything going white!`, 'story');
+        output.print(`Some time later, you come to beneath the tree.`, 'story');
+        return {
+          player: { room: 7 }
+        };
+      }
     }
   },
   {
@@ -109,6 +134,18 @@ export default [
       isLeavable: true,
       leaveDestinationObject: 12,
       leaveTransition: 'You climb out of the boat and back onto land.'
+    },
+    reactions: {
+      wave: (output, command, location, object, game, player, locations, objects) => {
+        if (object.tag !== 'fan') return;
+        output.print(`The wind intensifies, propelling the boat to the opposite shore!`, 'story');
+        const boat = objects.getItemByTag('boat');
+        const changes = {};
+        changes[boat.id] = { room: boat.state.room === 12 ? 14 : 12 }
+        return {
+          objects: changes
+        }
+      }
     }
   },
   {
@@ -160,6 +197,16 @@ export default [
       exits: [
         { direction: 'down', destination: 8 }
       ]
+    },
+    reactions: {
+      jump: (output, command, location, object, game, player, locations, objects) => {
+        output.print(`...and miss the limb on the way back down!`, 'story');
+        output.print(`You hit several limbs on your way down, finally slamming into`, 'story');
+        output.print(`the ground!`, 'story');
+        return {
+          player: { room: 7 }
+        };
+      }
     }
   }
 ]

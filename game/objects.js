@@ -61,8 +61,14 @@ export default [
     state: {
       room: 7
     },
+    actions: {
+      climb: (output, command, location, object, game, player, locations, objects) => {
+        output.print(`You cannot quite reach the branches.`, 'story');
+        return { abort: true };
+      }
+    },
     reactions: {
-      'jump': (output, command, location, object, game, player, locations, objects) => {
+      jump: (output, command, location, object, game, player, locations, objects) => {
         output.print(`You grab onto a bottom limb of the tree, and pull yourself up.`, 'story');
         return {
           player: { room: 8 }
@@ -89,6 +95,11 @@ export default [
     id: 13, name: 'a magic fan', tag: 'fan',
     state: {
       room: 8
+    },
+    reactions: {
+      wave: (output, command, location, object, game, player, locations, objects) => {
+        output.print(`You feel a refreshing breeze.`, 'story');
+      }
     }
   },
   {

@@ -97,16 +97,16 @@ export default class Action {
     if (changes.abort) return changes;
 
     // Perform reactions and gather state changes
-    if (_game.reactions.hasOwnProperty(primaryTag)) changes = Object.assign(changes, _game.postActions[primaryTag](output, command, _location, _object, _game, _player, _locations, _objects));
-    if (_player.reactions.hasOwnProperty(primaryTag)) changes = Object.assign(changes, _player.postActions[primaryTag](output, command, _location, _object, _game, _player, _locations, _objects));
-    if (_location && _location.reactions.hasOwnProperty(primaryTag)) changes = Object.assign(changes, _location.postActions[primaryTag](output, command, _location, _object, _game, _player, _locations, _objects));
-    if (_object && _object.reactions.hasOwnProperty(primaryTag)) changes = Object.assign(changes, _object.postActions[primaryTag](output, command, _location, _object, _game, _player, _locations, _objects));
+    if (_object && _object.reactions.hasOwnProperty(primaryTag)) changes = Object.assign(changes, _object.reactions[primaryTag](output, command, _location, _object, _game, _player, _locations, _objects));
+    if (_location && _location.reactions.hasOwnProperty(primaryTag)) changes = Object.assign(changes, _location.reactions[primaryTag](output, command, _location, _object, _game, _player, _locations, _objects));
     _carriedObjects.forEach(_carriedObject => {
       if (_carriedObject !== _object && _carriedObject.reactions.hasOwnProperty(primaryTag)) changes = Object.assign(changes, _carriedObject.reactions[primaryTag](output, command, _location, _object, _game, _player, _locations, _objects));
     });
     _localObjects.forEach(_localObject => {
       if (_localObject !== _object && _localObject.reactions.hasOwnProperty(primaryTag)) changes = Object.assign(changes, _localObject.reactions[primaryTag](output, command, _location, _object, _game, _player, _locations, _objects));
     });
+    if (_player.reactions.hasOwnProperty(primaryTag)) changes = Object.assign(changes, _player.reactions[primaryTag](output, command, _location, _object, _game, _player, _locations, _objects));
+    if (_game.reactions.hasOwnProperty(primaryTag)) changes = Object.assign(changes, _game.reactions[primaryTag](output, command, _location, _object, _game, _player, _locations, _objects));
     
     return changes;
   }

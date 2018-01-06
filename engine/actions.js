@@ -105,5 +105,25 @@ export default [
     action: (output, command, location, object, game, player, locations, objects) => {
       output.print(`You jump into the air!`, 'story');
     }
+  },
+  {
+    tag: 'climb',
+    action: (output, command, location, object, game, player, locations, objects) => {
+      if (!command.object && (!location.actions.hasOwnProperty('climb') || typeof location.actions.climb !== 'function')) {
+        output.print(`What do you want to climb?`, 'story');
+        return { abort: true };
+      }
+      if (object && (!object.actions.hasOwnProperty('climb') || typeof object.actions.climb !== 'function')) {
+        output.print(`You can't climb that!`, 'error');
+        return { abort: true };
+      }
+    }
+  },
+  {
+    tag: 'wave',
+    action: (output, command, location, object, game, player, locations, objects) => {
+      if (!object) output.print(`You wave.`, 'story');
+      if (object) output.print(`You wave ${object.name}.`, 'story');
+    }
   }
 ]
