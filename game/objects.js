@@ -7,21 +7,46 @@ export default [
   },
   {
     id: 2, name: 'a small box', tag: 'box',
+    identity: {
+      isOpenable: true
+    },
     state: {
-      room: 1
+      room: 1,
+      isOpen: false,
+      contents: [ 7 ]
     }
   },
   {
     id: 3, name: 'cabinet', tag: 'cabinet',
     identity: {
-      isFixed: true
+      isFixed: true,
+      isOpenable: true
     },
     state: {
-      room: 2
+      room: 2,
+      isOpen: false,
+      contents: [ 4 ]
     }
   },
   {
     id: 4, name: 'a salt shaker', tag: 'salt',
+    identity: {
+      isPourable: true
+    },
+    actions: {
+      pour: (output, command, location, object, game, player, locations, objects) => {
+        if (object.state.isEmpty) return;
+        output.print(`The cap on the shaker falls off, and all of the salt dumps out!`, 'story');
+        let objectChanges = {
+          4: { isEmpty: true }
+        };
+        const barrel = objects.getItem(6);
+        if (barrel.state.room === location.id) objectChanges[6] = { containsSalt: true };
+        return {
+          objects: objectChanges
+        }
+      }
+    }
   },
   {
     id: 5, name: 'a dictionary', tag: 'dictionary',
@@ -36,10 +61,41 @@ export default [
     },
     state: {
       room: 4
+    },
+    reactions: {
+      pour: (output, command, location, object, game, player, locations, objects) => {
+        const barrel = objects.getItem(6);
+        if (barrel.state.containsSalt && barrel.state.containsFormula) {
+          output.print(`There's an explosion!`, 'story');
+          output.print(`Everything goes white!  When you come to, you are...`, 'story');
+          output.print(`...somewhere else.`, 'story');
+          return {
+            player: { room: 6 }
+          };
+        }
+      }
     }
   },
   {
-    id: 7, name: 'a small bottle', tag: 'bottle'
+    id: 7, name: 'a small bottle', tag: 'bottle',
+    identity: {
+      isPourable: true
+    },
+    actions: {
+      pour: (output, command, location, object, game, player, locations, objects) => {
+        if (object.state.isEmpty) return;
+        output.print(`Although the red substance looks liquid, it comes out of the`, 'story');
+        output.print(`bottle in on blob.`, 'story');
+        let objectChanges = {
+          7: { isEmpty: true }
+        };
+        const barrel = objects.getItem(6);
+        if (barrel.state.room === location.id) objectChanges[6] = { containsFormula: true };
+        return {
+          objects: objectChanges
+        }
+      }
+    }
   },
   {
     id: 8, name: 'a ladder', tag: 'ladder',

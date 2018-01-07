@@ -16,6 +16,7 @@ export default [
       if (object.identity.isFixed) return output.print(`Try as you might, you can't pick up it up.`, 'story');
       
       output.print(`You pick up ${object.name}.`, 'story');
+
       let inventory = Array.from(player.state.inventory)
       inventory.push(object.id);
       let objectsChanges = {};
@@ -124,6 +125,47 @@ export default [
     action: (output, command, location, object, game, player, locations, objects) => {
       if (!object) output.print(`You wave.`, 'story');
       if (object) output.print(`You wave ${object.name}.`, 'story');
+    }
+  },
+  {
+    tag: 'open',
+    action: (output, command, location, object, game, player, locations, objects) => {
+      if (!object || !object.identity.isOpenable) {
+        output.print(`You can't open that!`, 'error');
+        return { abort: true };
+      }
+      if (object.state.isOpen) {
+        output.print(`It's already open!`, 'error');
+        return { abort: true };
+      }
+
+      output.print(`You open ${object.name}.`, 'story');
+      if (object.state.contents && object.state.contents.length > 0) {
+        output.print(`There's something inside!`, 'story');
+      } else {
+        output.print(`It's empty.`, 'story');
+      }
+      let objectChanges = {};
+      objectChanges[object.id] = { isOpen: true };
+      (object.state.contents || []).forEach(id => {
+        objectChanges[id] = { room: location.id };
+      });
+      return {
+        objects: objectChanges
+      }
+    }
+  },
+  {
+    tag: 'pour',
+    action: (output, command, location, object, game, player, locations, objects) => {
+      if (!object || !object.identity.isPourable) {
+        output.print(`You can't pour that!`, 'error');
+        return { abort: true };
+      }
+      if (object.state.isEmpty) {
+        output.print(`It's empty.`, 'error');
+        return { abort: true };
+      }
     }
   }
 ]

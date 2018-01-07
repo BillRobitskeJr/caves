@@ -3,7 +3,7 @@ export default {
     maxCarry: 5
   },
   state: {
-    room: 7,
+    room: 1,
     inventory: []
   }
 }
