@@ -156,8 +156,8 @@ export default class EngineCore {
    */
   _parseCommand(input) {
     console.log(`EngineCore#_parseCommand("${input}")`);
-    const action = input.split(/\s/)[0].trim();
-    const object = input.substr(action.length).trim();
+    const action = input.split(/\s/)[0].trim().toLowerCase();
+    const object = input.substr(action.length).trim().toLowerCase();
     return { action, object };
   }
 
