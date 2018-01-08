@@ -167,5 +167,35 @@ export default [
         return { abort: true };
       }
     }
+  },
+  {
+    tag: 'dig',
+    action: (output, command, location, object, game, player, locations, objects) => {
+      if (!!command.object) {
+        output.print(`You dig it!  Yeah!`, 'story');
+        return { abort: true };
+      }
+      const inventory = player.state.inventory.map(objectID => objects.getItem(objectID));
+      const shovel = inventory.find(object => !!object.identity.isDiggingTool);
+      if (!shovel) {
+        output.print(`You attempt to dig with your hands, but get nowhere.`, 'story');
+        return { abort: true };
+      }
+      if (location.identity.isHardGround) {
+        output.print(`The ground is too hard to dig.`, 'story');
+        return { abort: true };
+      }
+      output.print(`You dig into the ground with ${shovel.name}.`, 'story');
+      if (!location.state.buriedObjects || location.state.buriedObjects.length === 0) {
+        output.print(`You don't find anything.`, 'story');
+        return { abort: true };
+      }
+      output.print(`You found something!`, 'story');
+      let changes = {};
+      location.state.buriedObjects.forEach(objectID => {
+        changes[objectID] = { room: location.id };
+      });
+      return { objects: changes };
+    }
   }
 ]

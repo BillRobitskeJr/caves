@@ -1,6 +1,9 @@
 export default [
   {
     id: 1, name: 'in your living room',
+    identity: {
+      isHardGround: true
+    },
     state: {
       exits: [
         { direction: 'north', destination: 4 },
@@ -11,6 +14,9 @@ export default [
   },
   {
     id: 2, name: 'in the kitchen',
+    identity: {
+      isHardGround: true
+    },
     state: {
       exits: [
         { direction: 'west', destination: 1 }
@@ -19,6 +25,9 @@ export default [
   },
   {
     id: 3, name: 'in the library',
+    identity: {
+      isHardGround: true
+    },
     state: {
       exits: [
         { direction: 'north', destination: 1 }
@@ -36,6 +45,9 @@ export default [
   },
   {
     id: 5, name: 'in the garage',
+    identity: {
+      isHardGround: true
+    },
     state: {
       exits: [
         { direction: 'east', destination: 4 }
@@ -62,6 +74,9 @@ export default [
   },
   {
     id: 8, name: 'on a branch of a tree',
+    identity: {
+      isHardGround: true
+    },
     state: {
       exits: [
         { direction: 'down', destination: 7 }
@@ -130,6 +145,9 @@ export default [
   },
   {
     id: 13, name: 'inside a wooden boat',
+    identity: {
+      isHardGround: true
+    },
     state: {
       isLeavable: true,
       leaveDestinationObject: 12,
@@ -176,6 +194,9 @@ export default [
   },
   {
     id: 17, name: 'in a narrow hall',
+    identity: {
+      isHardGround: true
+    },
     state: {
       exits: [
         { direction: 'south', destination: 16 },
@@ -185,6 +206,9 @@ export default [
   },
   {
     id: 18, name: 'in a large hall',
+    identity: {
+      isHardGround: true
+    },
     state: {
       exits: [
         { direction: 'down', destination: 17 }
@@ -193,6 +217,9 @@ export default [
   },
   {
     id: 19, name: 'at the top of a tree',
+    identity: {
+      isHardGround: true
+    },
     state: {
       exits: [
         { direction: 'down', destination: 8 }

@@ -85,7 +85,7 @@ export default [
       pour: (output, command, location, object, game, player, locations, objects) => {
         if (object.state.isEmpty) return;
         output.print(`Although the red substance looks liquid, it comes out of the`, 'story');
-        output.print(`bottle in on blob.`, 'story');
+        output.print(`bottle in one blob.`, 'story');
         let objectChanges = {
           7: { isEmpty: true }
         };
@@ -105,6 +105,9 @@ export default [
   },
   {
     id: 9, name: 'a shovel', tag: 'shovel',
+    identity: {
+      isDiggingTool: true
+    },
     state: {
       room: 5
     }
