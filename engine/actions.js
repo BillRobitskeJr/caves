@@ -197,5 +197,30 @@ export default [
       });
       return { objects: changes };
     }
+  },
+  {
+    tag: 'fight',
+    action: (output, command, location, object, game, player, locations, objects) => {
+      if (!command.object) {
+        output.print(`What do you want to fight?`, 'error');
+        return { abort: true };
+      }
+      if (!object) {
+        output.print(`You can't fight that!`, 'error');
+        return { abort: true };
+      }
+      if (!object.identity.isEnemy) {
+        output.print(`Why...?`, 'error');
+        return { abort: true };
+      }
+      const weapon = player.state.inventory
+        .map(id => objects.getItem(id))
+        .find(item => !!item.identity.isWeapon);
+      if (!weapon) {
+        output.print(`You don't have a weapon, and fighting bare-handed doesn't seem`, 'story');
+        output.print(`an option.`, 'story');
+        return { abort: true };
+      }
+    }
   }
 ]

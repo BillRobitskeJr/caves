@@ -136,7 +136,10 @@ export default [
     }
   },
   {
-    id: 11, name: 'a golden sword', tag: 'sword'
+    id: 11, name: 'a golden sword', tag: 'sword',
+    identity: {
+      isWeapon: true
+    }
   },
   {
     id: 12, name: 'a wooden boat', tag: 'boat',
@@ -163,6 +166,9 @@ export default [
   },
   {
     id: 14, name: 'a nasty-looking guard', tag: 'guard',
+    identity: {
+      isEnemy: true
+    },
     state: {
       room: 16
     },
@@ -177,6 +183,14 @@ export default [
             }
           };
         }
+      },
+      fight: (output, command, location, game, player, locations, objects) => {
+        output.print(`The guard, seeing your sword, retreats into the castle.`, 'story');
+        return {
+          objects: {
+            14: { room: null }
+          }
+        };
       }
     }
   },
