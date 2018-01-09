@@ -224,5 +224,36 @@ export default [
         return { abort: true };
       }
     }
+  },
+  {
+    tag: 'wear',
+    action: (output, command, location, object, game, player, locations, objects) => {
+      if (!command.object) {
+        output.print(`What do you want to wear?`, 'error');
+        return { abort: true };
+      }
+      if (!object || !object.identity.isWearable) {
+        output.print(`You can't wear that!`, 'error');
+        return { abort: true };
+      }
+      if (player.state.wearing) {
+        const wornObject = objects.getItem(player.state.wearing);
+        if (object.id === wornObject.id) {
+          output.print(`You're already wearning ${wornObject.name}!`, 'error');
+          return { abort: true };
+        } else {
+          output.print(`You remove ${wornObject.name}.`, 'story');
+          return {
+            player: { wearing: null }
+          };
+        }
+      }
+    },
+    completion: (output, command, location, object, game, player, locations, objects) => {
+      output.print(`You put on ${object.name}.`, 'story');
+      return {
+        player: { wearing: object.id }
+      };
+    }
   }
 ]

@@ -210,6 +210,8 @@ export default [
         if (!wornObject || wornObject.tag !== 'gloves') {
           output.print(`The case is electrified!`, 'story');
           return { abort: true };
+        } else {
+          output.print(`The gloves insulate against the electricity!`, 'story');
         }
       }
     }
@@ -219,6 +221,9 @@ export default [
   },
   {
     id: 17, name: 'a pair of rubber gloves', tag: 'gloves',
+    identity: {
+      isWearable: true
+    },
     state: {
       room: 19
     }
