@@ -14,18 +14,19 @@ export default [
       if (object.state.room !== location.id) return output.print(`It's not here!`, 'error');
       if (player.state.inventory.length >= player.identity.maxCary) return output.print(`You can't carry any more!`, 'error');
       if (object.identity.isFixed) return output.print(`Try as you might, you can't pick up it up.`, 'story');
-      
+    },
+    completion: (output, command, location, object, game, player, locations, objects) => {
       output.print(`You pick up ${object.name}.`, 'story');
-
-      let inventory = Array.from(player.state.inventory)
+      
+      let inventory = Array.from(player.state.inventory);
       inventory.push(object.id);
       let objectsChanges = {};
-      objectsChanges[object.id] = { room: null }
+      objectsChanges[object.id] = { room: null };
 
       return {
         player: { inventory },
         objects: objectsChanges
-      }
+      };
     }
   },
   {
@@ -138,7 +139,8 @@ export default [
         output.print(`It's already open!`, 'error');
         return { abort: true };
       }
-
+    },
+    completion: (output, command, location, object, game, player, locations, objects) => {
       output.print(`You open ${object.name}.`, 'story');
       if (object.state.contents && object.state.contents.length > 0) {
         output.print(`There's something inside!`, 'story');
@@ -152,7 +154,7 @@ export default [
       });
       return {
         objects: objectChanges
-      }
+      };
     }
   },
   {

@@ -42,6 +42,7 @@ export default class Action {
   constructor(config = {}) {
     this._tags = config.tags || [config.tag]
     this._action = config.action || (() => {});
+    this._completion = config.completion || (() => {});
   }
 
   /**
@@ -88,6 +89,7 @@ export default class Action {
     if (_player.actions.hasOwnProperty(primaryTag)) changes = Object.assign(changes, _player.actions[primaryTag](output, command, _location, _object, _game, _player, _locations, _objects));
     if (_location && _location.actions.hasOwnProperty(primaryTag)) changes = Object.assign(changes, _location.actions[primaryTag](output, command, _location, _object, _game, _player, _locations, _objects));
     if (_object && _object.actions.hasOwnProperty(primaryTag)) changes = Object.assign(changes, _object.actions[primaryTag](output, command, _location, _object, _game, _player, _locations, _objects));
+    if (!changes.abort) changes = Object.assign(changes, this._completion(output, command, _location, _object, _game, _player, _locations, _objects));
     
     // Apply "action" state changes
     _game.updateState(changes.game || {});

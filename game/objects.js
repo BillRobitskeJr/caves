@@ -197,10 +197,21 @@ export default [
   {
     id: 15, name: 'a glass case', tag: 'case',
     identity: {
-      isFixed: true
+      isFixed: true,
+      isOpenable: true
     },
     state: {
-      room: 18
+      room: 18,
+      contents: [ 16 ]
+    },
+    actions: {
+      open: (output, command, location, object, game, player, locations, objects) => {
+        const wornObject = objects.getItem(player.state.wearing || 0);
+        if (!wornObject || wornObject.tag !== 'gloves') {
+          output.print(`The case is electrified!`, 'story');
+          return { abort: true };
+        }
+      }
     }
   },
   {
