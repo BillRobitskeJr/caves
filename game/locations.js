@@ -62,6 +62,15 @@ export default [
         { direction: 'south', destination: 7 }
       ],
       buriedObjects: [ 11 ]
+    },
+    actions: {
+      examine: (output, command, location, object, game, player, locations, objects) => {
+        if (location.state.buriedObjects.length > 0) {
+          output.print(`It looks like something's buried here.`, 'story');
+        } else {
+          output.print(`You see nothing unusual.`, 'story');
+        }
+      }
     }
   },
   {

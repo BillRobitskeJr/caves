@@ -103,8 +103,15 @@ export default class EngineCore {
           this._objectEntities.updateStates(changes.objects);
         }
         this._gameEntity.updateState({ turnCount: this._gameEntity.state.turnCount + 1 });
-        this._displayRoom();
-        this._displayInventory();
+        if (this._gameEntity.state.isWon) {
+          this._engineState = 2;
+        } else {
+          this._displayRoom();
+          this._displayInventory();
+          break;
+        }
+      case 2:
+        this._output.print(`                         ~~~ YOU WIN! ~~~`);
     } 
   }
 

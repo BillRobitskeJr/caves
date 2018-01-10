@@ -17,5 +17,10 @@ instructions for going there to find it.`
     ]
   },
   actions: {
+  },
+  reactions: {
+    get: (output, command, location, object, game, player, locations, objects) => {
+      if (object.tag === 'ruby') return { game: { isWon: true }};
+    }
   }
 }

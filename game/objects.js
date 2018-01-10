@@ -3,6 +3,13 @@ export default [
     id: 1, name: 'an old diary', tag: 'diary',
     state: {
       room: 1
+    },
+    actions: {
+      read: (output, command, location, object, game, player, locations, objects) => {
+        output.print(`It reads:`, 'story');
+        output.print(`Add sodium chloride plus the formula to rainwater to reach the`, 'story');
+        output.print(`other world.`, 'story');
+      }
     }
   },
   {
@@ -50,6 +57,9 @@ export default [
   },
   {
     id: 5, name: 'a dictionary', tag: 'dictionary',
+    identity: {
+      writing: `Sodium chloride is common table salt.`
+    },
     state: {
       room: 3
     }
@@ -57,7 +67,8 @@ export default [
   {
     id: 6, name: 'wooden barrel', tag: 'barrel',
     identity: {
-      isFixed: true
+      isFixed: true,
+      description: `It's filled with rainwater.`
     },
     state: {
       room: 4
@@ -79,7 +90,9 @@ export default [
   {
     id: 7, name: 'a small bottle', tag: 'bottle',
     identity: {
-      isPourable: true
+      isPourable: true,
+      description: `There's something written on it.`,
+      writing: `Secret formula`
     },
     actions: {
       pour: (output, command, location, object, game, player, locations, objects) => {

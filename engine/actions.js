@@ -193,11 +193,12 @@ export default [
         return { abort: true };
       }
       output.print(`You found something!`, 'story');
-      let changes = {};
+      let changes = { locations: {}, objects: {} };
       location.state.buriedObjects.forEach(objectID => {
-        changes[objectID] = { room: location.id };
+        changes.objects[objectID] = { room: location.id };
       });
-      return { objects: changes };
+      changes.locations[location.id] = { buriedObjects: [] };
+      return changes;
     }
   },
   {
@@ -254,6 +255,48 @@ export default [
       return {
         player: { wearing: object.id }
       };
+    }
+  },
+  {
+    tag: 'read',
+    action: (output, command, location, object, game, player, locations, objects) => {
+      if (!object) {
+        output.print(`What do you want to read?`, 'error');
+        return { abort: true };
+      }
+      if (!object || (!object.identity.writing && typeof object.actions.read !== 'function')) {
+        output.print(`You can't read that!`, 'error');
+        return { abort: true };
+      }
+    },
+    completion: (output, command, location, object, game, player, locations, objects) => {
+      if (object.identity.writing) {
+        output.print(`It reads:`, 'story');
+        output.print(`${object.identity.writing}`, 'story');
+      }
+    }
+  },
+  {
+    tag: 'examine',
+    action: (output, command, location, object, game, player, locations, objects) => {
+      if (!command.object) {
+        if (!location.identity.description && typeof location.actions.examine !== 'function') {
+          output.print(`You see nothing unusual.`, 'story');
+          return { abort: true };
+        }
+      } else {
+        if (!object) {
+          output.print(`What do you want to examine?`, 'error');
+          return { abort: true };
+        }
+        if (!object.identity.description && typeof object.actions.examine !== 'function') {
+          output.print(`You see nothing unusual.`, 'story');
+          return { abort: true };
+        }
+      }
+    },
+    completion: (output, command, location, object, game, player, locations, objects) => {
+      if (object.identity.description) output.print(`${object.identity.description}`, 'story');
     }
   }
 ]
