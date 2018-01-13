@@ -1,15 +1,23 @@
 /**
- * Caves engine core module
- * @copyright Bill Robitske, Jr.  2017-2018
- * @author    Bill Robitske, Jr. <bill.robitske.jr@gmail.com>
- * @license   MIT
+ * Game engine core
+ * @copyright   Bill Robitske, Jr. 2017-2018
+ * @author      Bill Robitske, Jr. <bill.robitske.jr@gmail.com>
+ * @license     MIT
  */
 
-import Action from './action.js'
 import Entity from './entity.js'
+import LocationEntity from './location-entity.js'
+import ObjectEntity from './object-entity.js'
 import Collection from './collection.js'
 
-import defaultActions from './actions.js'
+// Symbols for semi-private members
+const _mainOutput = Symbol('output.main');
+const _locationOutput = Symbol('output.location');
+const _playerOutput = Symbol('output.player');
+const _game = Symbol('game');
+const _player = Symbol('player');
+const _locations = Symbol('locations');
+const _objects = Symbol('objects');
 
 /**
  * Game engine core class
@@ -17,168 +25,114 @@ import defaultActions from './actions.js'
 export default class EngineCore {
 
   /**
-   * @typedef   EngineCore~output
-   * @property  {EngineCore~printCallback}  print - Function to print text to output
-   * @property  {function}                  clear - Function to clear the output
+   * Create a new game engine core
+   * @param     {Object}              outputs
+   * @param     {EngineCore.Output}   outputs.main
+   * @param     {EngineCore.Output}   [outputs.location]
+   * @param     {engineCore.Output}   [outputs.player]
+   * @param     {Object}              entityConfigs
+   * @param     {Entity.Config}       entityConfigs.game
+   * @param     {Entity.Config}       entityConfigs.player
+   * @param     {Entity.Config[]}     entityConfigs.locations
+   * @param     {Entity.Config[]}     entityConfigs.objects
+   */
+  constructor(outputs = {}, entityConfigs = {}) {
+    this[_mainOutput] = outputs.main || { print: console.log.bind(console), clear: console.clear.bind(console) };
+    this[_locationOutput] = outputs.location || { print: this[_mainOutput].print.bind(this[_mainOutput]), clear: () => {} };
+    this[_playerOutput] = outputs.player || { print: this[_mainOutput].print.bind(this[_mainOutput]), clear: () => {} };
+
+    this[_game] = new Entity(Object.assign({ type: 'game', id: 1 }, entityConfigs.game));
+    this[_player] = new Entity(Object.assign({ type: 'player', id: 1 }, entityConfigs.player));
+    this[_locations] = Collection.createFromConfigs(entityConfigs.locations || [], LocationEntity, 'location');
+    this[_objects] = Collection.createFromConfigs(entityConfigs.objects || [], ObjectEntity, 'object');
+  }
+
+  /**
+   * @typedef   EngineCore.Command
+   * @property  {string}  verb        - Verb entered
+   * @property  {string}  predicate   - Predicate phrase entered
+   * @property  {Entity}  actor       - Actor of this command
+   * @property  {Action}  action      - Action to be taken by actor
+   * @property  {?Entity} object      - Object of action to be taken
+   * @property  {Entity}  setting     - Location of the actor of this command
+   */
+  
+  /**
+   * @typedef   EngineCore.Output
+   * @property  {EngineCore.Output.PrintHandler}  print - Function to print text to an output
+   * @property  {EngineCore.Output.ClearHandler}  clear - Fuction to clear an output
    */
 
   /**
-   * @callback  EngineCore~printCallback
-   * @param     {string}  message - Message to be printed
-   * @param     {string}  [style] - Optional style to print the message in
+   * @callback  EngineCore.Output.PrintHandler
+   * @param     {string}  message   - Message to be printed to the output
+   * @param     {string}  [style]   - Optional style to apply to the message
    */
 
   /**
-   * Create a new engine core instance
-   * @param     {object}            [config]
-   * @param     {EngineCore~output} [config.output]           - Main output for the game
-   * @param     {EngineCore~output} [config.roomOutput]       - Output for running room display
-   * @param     {EngineCore~output} [config.inventoryOutput]  - Output for running inventory display
+   * @callback  EngineCore.Output.ClearHandler
    */
-  constructor(config = {}) {
-    this._output = config.output || {
-      print: (msg, style) => { console.log(msg); },
-      clear: () => { console.clear(); }
-    }
-    this._roomOutput = config.roomOutput || {
-      print: (msg, style) => { this.output(msg, style); },
-      clear: () => {}
-    };
-    this._inventoryOutput = config.inventoryOutput || {
-      print: (msg, style) => { this.output(msg, style); },
-      clear: () => {}
-    };
 
-    const actions = defaultActions;
-    this._actions = new Collection(actions, Action);
+  /**
+   * Parse player input
+   * @param     {string}  input       - Player-entered input
+   * @returns   {EngineCore.Command}  - Parsed player command
+   */
+  parseInput(input) {
+    console.log(`EngineCore#parseInput("${input}")`);
+    const playerVerbs = this[_player].performableVerbs;
+    const maxVerbLength = playerVerbs.reduce((maxLength, verb) => Math.max(maxLength, verb.length), 0);
+    const action = this[_player].getAction(input.substr(0, maxVerbLength));
+    const setting = this[_locations].getEntity(this[_player].getState('location'));
     
-    this._engineState = 0; // 0 = Entry state, 1 = Main loop, 2 = Ending state
-    this._gameEntity = new Entity(config.game);
-    this._playerEntity = new Entity(config.player);
-    this._locationEntities = new Collection(config.locations, Entity);
-    this._objectEntities = new Collection(config.objects, Entity);
+    if (!action) {
+      const split = input.split(/\s+/g);
+      const verb = (split[0] || '').toLowerCase();
+      const predicate = split.slice(1).join(' ').toLowerCase();
+      return {
+        verb,
+        predicate,
+        actor: this[_player].clone(),
+        action: null,
+        object: null,
+        setting: setting ? setting.clone() : null
+      };
+    }
+
+    const verb = input.match(action.verbExpression)[1].toLowerCase();
+    const predicate = input.substr(verb.length).trim().toLowerCase();
+    const object = this[_objects].findEntity(entity => entity.tagExpression.test(predicate));
+    return {
+      verb,
+      predicate,
+      actor: this[_player].clone(),
+      action,
+      object,
+      setting: setting ? setting.clone() : null
+    };
   }
 
   /**
-   * Start the game
-   */
-  startGame() {
-    console.log(`EngineCore#startGame()`);
-    this._output.clear();
-    this._roomOutput.clear();
-    this._inventoryOutput.clear();
-
-    this._engineState = 0;
-    this._gameEntity.updateState({ openingPage: 0 });
-    this._displayOpening();
-  }
-
-  /**
-   * Perform the player's turn based on their input
-   * @param   {string}  input - Player-entered command
+   * Respond to player input
+   * @param     {string}  input       - Player-entered input
    */
   handleInput(input) {
     console.log(`EngineCore#handleInput("${input}")`);
-    switch (this._engineState) {
-      case 0:
-        if (this._gameEntity.state.openingPage < this._gameEntity.identity.openingPages.length) {
-          this._displayOpening();
-        } else {
-          this._output.clear();
-          this._gameEntity.updateState({ turnCount: 0 });
-          this._engineState++;
-          this._displayRoom();
-          this._displayInventory();
-        }
-        break;
-      case 1:
-        const command = this._parseCommand(input);
-        console.log(`EngineCore#handleInput~command:`, command);
-        if (command.action) {
-          const changes = this._performCommand(command) || {};
-          console.log(`EngineCore#handleInput~changes:`, changes);
-          this._gameEntity.updateState(changes.game);
-          this._playerEntity.updateState(changes.player);
-          this._locationEntities.updateStates(changes.locations);
-          this._objectEntities.updateStates(changes.objects);
-        }
-        this._gameEntity.updateState({ turnCount: this._gameEntity.state.turnCount + 1 });
-        if (this._gameEntity.state.isWon) {
-          this._engineState = 2;
-        } else {
-          this._displayRoom();
-          this._displayInventory();
-          break;
-        }
-      case 2:
-        this._output.print(`                         ~~~ YOU WIN! ~~~`);
-    } 
-  }
+    const command = this.parseInput(input);
+    console.log(`EngineCore#handleInput~command:`, command);
+    if (!command.verb) return;
+    if (command.action) {
+      const game = this[_game].clone();
+      const player = this[_player].clone();
+      const locations = this[_locations].clone();
+      const objects = this[_objects].clone();
 
-  /**
-   * Display a page of the game's opening
-   */
-  _displayOpening() {
-    console.log(`EngineCore#_displayOpening()`);
-    let page = this._gameEntity.state.openingPage;
-    this._output.print(this._gameEntity.identity.openingPages[page], 'story');
-    this._output.print(`Press [Return] to continue...`);
-    this._gameEntity.updateState({ openingPage: ++page });
-  }
-
-  /**
-   * Display the current room in the room display
-   */
-  _displayRoom() {
-    console.log(`EngineCore#_displayRoom()`);
-    const room = this._locationEntities.getItem(this._playerEntity.state.room) || new Entity();
-    const exits = (room.state.exits || []).map(exit => exit.direction).join(', ');
-    const objects = this._objectEntities.getItemsByState({ room: room.id }).map(object => `   ${object.name}`).join('\n');
-    this._roomOutput.clear();
-    this._roomOutput.print(`You are ${room.name || 'nowhere'}.`);
-    this._roomOutput.print(`You can go: ${exits || 'nowhere'}`);
-    this._roomOutput.print(`You can see:`);
-    this._roomOutput.print(`${objects || '   nothing of interest'}`);
-  }
-
-  /**
-   * Display the player's inventory in the inventory display
-   */
-  _displayInventory() {
-    console.log(`EngineCore#_displayInventory()`);
-    const maxCarry = this._playerEntity.identity.maxCarry || 0;
-    const inventory = this._playerEntity.state.inventory || [];
-    const objects = inventory.map(id => this._objectEntities.getItem(id)).filter(object => object !== null).map(object => `   ${object.name}`).join('\n');
-    const remainingCarry = maxCarry - inventory.length;
-    this._inventoryOutput.clear();
-    this._inventoryOutput.print(`You are carrying:`);
-    this._inventoryOutput.print(`${objects || '   nothing'}`);
-    this._inventoryOutput.print(`You can carry ${remainingCarry || 0} more.`);
-  }
-
-  /**
-   * Split the player's command into it's action/object pair
-   * @param   {string}  input - Player-entered command
-   * @returns {{action: string, object: string}}  - Parsed command
-   */
-  _parseCommand(input) {
-    console.log(`EngineCore#_parseCommand("${input}")`);
-    const action = input.split(/\s/)[0].trim().toLowerCase();
-    const object = input.substr(action.length).trim().toLowerCase();
-    return { action, object };
-  }
-
-  /**
-   * Perform the player's command
-   * @param {{action: string, object: string}}  command - Parsed command
-   */
-  _performCommand(command) {
-    console.log(`EngineCore#_performCommand(command):`, command);
-    const action = this._actions.getItemByTag(command.action);
-    if (!action) return this._output.print(`You don't know how to do that!`, 'error');
-    const location = this._locationEntities.getItem(this._playerEntity.state.room);
-    const object = command.object ? this._objectEntities.getItemByTag(command.object) : null;
-    const isObjectValid = object && (object.state.room === location.id || this._playerEntity.state.inventory.indexOf(object.id) !== -1);
-    return action.perform(this._output, command, location, isObjectValid ? object : null, this._gameEntity, this._playerEntity, this._locationEntities, this._objectEntities);
+      const startUpdates = command.action.start(command, this[_mainOutput], { game, player, locations, objects });
+      if (startUpdates.abort) return;
+      
+      const completeUpdates = command.action.complete(command, this[_mainOutput], { game, player, locations, objects });
+    } else {
+      this[_mainOutput].print(`You don't know how to do that!`, 'error');
+    }
   }
 }

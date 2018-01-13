@@ -5,81 +5,101 @@
  * @license     MIT
  */
 
+import Action from './action.js'
+
+// Symbols for semi-private members
+const _type = Symbol('type');
+const _id = Symbol('id');
+const _states = Symbol('states');
+const _actions = Symbol('actions');
+
 /**
  * Game entity class
  */
 export default class Entity {
 
   /**
+   * @typedef   Entity.StateDefinition
+   * @property  {string}  key           - State key name
+   * @property  {boolean} isImmutable   - State is immutable outside possessing entity
+   * @property  {*}       value         - State value
+   */
+
+  /**
+   * @typedef   Entity.Config
+   * @property  {string}                    type    - Entity "class" (i.e. game, player, location, or object)
+   * @property  {number}                    id      - Unique ID number
+   * @property  {Entity.StateDefinition[]}  states  - Initial entity states
+   */
+
+  /**
    * Create a new game entity
-   * @param   {Object}                            [config]            - Initialization values
-   * @param   {number}                            [config.id]         - ID of this entity
-   * @param   {string}                            [comfig.name]       - Human-readable name of this entity
-   * @param   {string}                            [config.tag]        - Tag associated with this entity
-   * @param   {Object.<string, *>}                [config.identity]   - Immutable state
-   * @param   {Object.<string, *>}                [config.state]      - Mutable state
-   * @param   {Object.<string, Action~callback>}  [config.actions]    - Actions related to this entity
-   * @param   {Object.<string, Action~callback>}  [config.reactions]  - Action reactions related to this entity
+   * @param     {Entity.Config}   config      - Configuration for this entity
    */
   constructor(config = {}) {
-    this._id = config.id || 0;
-    this._name = config.name || '';
-    this._tag = config.tag || '';
-
-    this._identity = Object.assign({}, config.identity || {});
-    this._state = Object.assign({}, config.state || {});
-
-    this._actions = Object.assign({}, config.actions || {});
-    this._reactions = Object.assign({}, config.reactions || {});
+    this[_type] = config.type || this[_type] || 'generic';
+    this[_id] = config.id || this[_id] || 0;
+    this[_states] = (config.states || []).reduce((states, state) => {
+      states[state.key] = { isImmutable: !!state.isImmutable, value: state.value };
+      return states;
+    }, this[_states] || {});
+    this[_actions] = (config.actions || []).map(action => action instanceof Action ? action.cloneForActor(this) : new Action(this, action));
   }
 
   /**
-   * @property  {number}  id    - This entity's ID
+   * @property  {string}  type  - Class of entity
    * @readonly
    */
-  get id() { return this._id; }
+  get type() { return this[_type]; }
 
   /**
-   * @property  {string}  name  - This entity's human-readable name
+   * @property  {number}  id    - Unique (within class) entity ID
    * @readonly
    */
-  get name() { return this._name; }
+  get id() { return this[_id]; }
 
   /**
-   * @property  {string}  tag   - This entity's tag
+   * @property  {Entity.StateDefinition[]}  states  - Definitions of this entity's current states
    * @readonly
    */
-  get tag() { return this._tag; }
+  get states() { return Object.keys(this[_states]).map(key => ({ key, isImmutable: this[_states][key].isImmutable, value: this[_states][key].value })); }
 
   /**
-   * @property  {Object.<string, *>}  identity  - This entity's immutable state
+   * Get a state value of this entity
+   * @param     {string}  key   - Key name of the desired state
+   * @returns   {?*}            - This entity's state value for this key
+   */
+  getState(key) { return this[_states].hasOwnProperty(key) ? (typeof this[_states][key].value === 'function' ? this[_states][key].value(this) || null : this[_states][key].value) : null; }
+
+  /**
+   * Request an update a state value of this entity
+   * @param     {string}  key         - Key name of the desired state
+   * @param     {*}       value       - Desired new value for this state
+   * @param     {Entity}  requester   - Entity requesting this change
+   */
+  updateState(key, value, requester) {
+    if (!this[_states].hasOwnProperty(key)) this[_states][key] = { isImmutable: false, value: null };
+    if (requester === this || !this[_states][key].isImmutable) this[_states][key] = value;
+  }
+
+  /**
+   * @property  {string[]}  performableVerbs  - All verbs this entinty can perform an action for
    * @readonly
    */
-  get identity() { return Object.assign({}, this._identity); }
+  get performableVerbs() { return this[_actions].reduce((verbs, action) => verbs.concat(action.verbs), []); }
 
   /**
-   * @property  {Object.<string, *>}  state     - This entity's mutable state
+   * @property  {Action[]}  actions - Actions performable by this entity
    * @readonly
    */
-  get state() { return Object.assign({}, this._state); }
+  get actions() { return Array.from(this[_actions]); }
 
   /**
-   * Apply changes to this entity's mutable state
-   * @param {Object.<string, *>}  patch - Changes to apply
+   * Get this entity's action associated with a verb
+   * @param     {string}  verb  - Verb associated with the desired action
+   * @returns   {?Action}       - This entity's action associated with this verb
    */
-  updateState(patch) { this._state = Object.assign({}, this.state, patch); }
-
-  /**
-   * @property  {Object.<string, Action~callback>}  actions   - Actions related to this entity
-   * @readonly
-   */
-  get actions() { return this._actions; }
-
-  /**
-   * @property  {Object.<string, Action~callback>}  reactions - Reactions related to this entity
-   * @readonly
-   */
-  get reactions() { return this._reactions; }
+  getAction(verb) { return this[_actions].find(action => verb.match(action.verbExpression) !== null); }
 
   /**
    * Create a copy of this entity
@@ -87,13 +107,11 @@ export default class Entity {
    */
   clone() {
     return new Entity({
-      id: this._id,
-      name: this._name,
-      tag: this._tag,
-      identity: this._identity,
-      state: this._state,
-      actions: this._actions,
-      reactions: this._reactions
+      type: this[_type],
+      id: this[_id],
+      states: Object.keys(this[_states])
+                    .map(key => ({ key, isImmutable: this[_states][key].isImmutable, value: this[_states][key].value })),
+      actions: this[_actions]
     });
   }
 }

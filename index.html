@@ -4,33 +4,26 @@
     <title>The Quest</title>
     <script src="./elements/brj-terminal.js"></script>
     <script type="module">
-      import GameEngine from './engine/core.js';
+      import GameEngine from './engine/core.js'
 
-      import gameConfig from './game/game.js';
-      import playerConfig from './game/player.js';
-      import locationsConfig from './game/locations.js';
-      import objectsConfig from './game/objects.js';
+      import gameConfig from './the-quest/config.js'
 
       window.addEventListener('load', () => {
         const mainScreen = document.getElementById('main-screen');
 
         // Construct game
         const game = new GameEngine({
-          output: mainScreen,
-          roomOutput: document.getElementById('room-display'),
-          inventoryOutput: document.getElementById('inventory-display'),
-          game: gameConfig,
-          player: playerConfig,
-          locations: locationsConfig,
-          objects: objectsConfig
-        });
+          main: mainScreen,
+          location: document.getElementById('room-display'),
+          player: document.getElementById('inventory-display')
+        }, gameConfig);
         mainScreen.addEventListener('command', (event) => {
           game.handleInput(event.detail.input);
         });
         mainScreen.focus();
 
         // Start game
-        game.startGame();
+        //game.startGame();
       });
     </script>
     <style>
