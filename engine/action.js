@@ -159,7 +159,7 @@ export default class Action {
    */
   mergeUpdates(...updates) {
     return updates.reduce((mergedUpdates, update) => {
-      mergedUpdates.abort = mergedUpdates.abort || update.abort;
+      mergedUpdates.abort = !!mergedUpdates.abort || !!update.abort;
       mergedUpdates.game = Object.assign(mergedUpdates.game, update.game || {});
       mergedUpdates.player = Object.assign(mergedUpdates.player, update.player || {});
       Object.keys(update.locations || {}).forEach(id => {

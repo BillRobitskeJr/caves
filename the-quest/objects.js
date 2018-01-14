@@ -44,6 +44,33 @@ export default [
           return self.getState('isEmpty') ? `The shaker is empty.` : `Woah!  It contains salt!`;
         }
       }
+    ],
+    actions: [
+      {
+        verbs: ['pourSalt'],
+        start: (actor, command, output, entities) => {},
+        complete: (actor, command, output, entities) => {
+          if (actor.id !== command.object.id) return {};
+
+          output.print(`The cap on the shaker falls off, and all of the salt pours out!`, 'story');
+          const objectUpdates = {
+            [actor.id]: { isEmpty: true }
+          };
+          const barrel = entities.objects.findEntity(object => object.tagExpression.test('barrel'));
+          if (barrel && barrel.getState('location') === command.actor.getState('location')) {
+            objectUpdates[barrel.id] = { containsSalt: true };
+          }
+          return {
+            objects: objectUpdates
+          };
+        }
+      }
+    ],
+    reactions: [
+      {
+        trigger: { type: 'action', verb: 'pour', phase: 'complete' },
+        actionVerb: 'pourSalt'
+      }
     ]
   },
   {
@@ -78,19 +105,16 @@ export default [
     actions: [
       {
         verbs: ['pourFormula'],
-        start: (actor, command, output, entities) => {
-          if (actor.id !== command.object.id ||
-              actor.getState('location') !== command.actor.getState('location')) {
-            return { abort: true };
-          }
-        },
+        start: (actor, command, output, entities) => {},
         complete: (actor, command, output, entities) => {
+          if (actor.id !== command.object.id) return {};
+
           output.print(`Although the contents appeared to be liquid, it comes out in a`, 'story');
           output.print(`single gummy blob.`, 'story');
           const objectUpdates = {
             [actor.id]: { isEmpty: true }
           };
-          const barrel = entities.objects.getEntity(object => object.tagExpression.test('barrel'));
+          const barrel = entities.objects.findEntity(object => object.tagExpression.test('barrel'));
           if (barrel && barrel.getState('location') === command.actor.getState('location')) {
             objectUpdates[barrel.id] = { containsFormula: true };
           }

@@ -175,6 +175,7 @@ export default class EngineCore {
         objects: this[_objects].clone()
       });
       if (updates.abort) return;
+      console.log(`EngineCore#performPlayerCommand~updates:`, updates);
 
       // Apply final state updates to game entities
       Object.keys(updates.game).forEach(key => { this[_game].updateState(key, updates.game[key], command.actor); });
