@@ -42,7 +42,8 @@ export default class LocationEntity extends Entity {
       id: this.id,
       name: this.name,
       states: this.states,
-      actions: this.actions
+      actions: this.actions,
+      reactions: this.reactions
     });
   }
 }

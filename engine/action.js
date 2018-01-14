@@ -69,12 +69,53 @@ export default class Action {
    */
   get verbExpression() { return new RegExp(`(${this[_verbs].join('|')})`, 'i'); }
 
+  perform(command, output, entities) {
+    console.log(`Action#perform(command, output, entities):`, {
+      self: this,
+      command, output, entities
+    });
+    const _entities = {
+      game: entities.game.clone(),
+      player: entities.player.clone(),
+      locations: entities.locations.clone(),
+      objects: entities.objects.clone()
+    };
+
+    // Start action and capture state updates
+    const startUpdates = this.start(command, output, _entities);
+    console.log(`Action#perform~startUpdates:`, startUpdates);
+    if (startUpdates.abort) return { abort: true };
+    this.updateEntities(_entities, startUpdates);
+
+    // Trigger "start" phase reactions
+    const startReactionUpdates = this.triggerReactions(command, output, _entities, 'start');
+    console.log(`Action#perform~startReactionUpdates:`, startReactionUpdates);
+    this.updateEntities(_entities, startReactionUpdates);
+
+    // Complete action and capture state updates
+    const completeUpdates = this.complete(command, output, _entities);
+    console.log(`Action#perform~completeUpdates:`, completeUpdates);
+    if (completeUpdates.abort) return { abort: true };
+    this.updateEntities(_entities, completeUpdates);
+
+    // Trigger "complete" phase reactions
+    const completeReactionUpdates = this.triggerReactions(command, output, _entities, 'complete');
+    console.log(`Action#perform~completeReactionUpdates:`, completeReactionUpdates);
+    this.updateEntities(_entities, completeReactionUpdates);
+
+    // Combine state updates
+    const updates = this.mergeUpdates(startUpdates, startReactionUpdates, completeUpdates, completeReactionUpdates);
+    console.log(`Action#perform~updates:`, updates);
+
+    return updates;
+  }
+
   /**
    * Start performing this action
    * @param     {EngineCore.Command}  command   - Command being performed
    * @param     {EngineCore.Output}   output    - Game output
    * @param     {Action.Entities}     entities  - Current/effective entities
-   * @returns   {Action.stateUpdates}           - Requested updates to entity states
+   * @returns   {Action.StateUpdates}           - Requested updates to entity states
    */
   start(command, output, entities) {
     return this[_start](this[_actor], command, output, entities) || {};
@@ -85,10 +126,70 @@ export default class Action {
    * @param     {EngineCore.Command}  command   - Command being performed
    * @param     {EngineCore.Output}   output    - Game output
    * @param     {Action.Entities}     entities  - Current/effective entities
-   * @returns   {Action.stateUpdates}           - Requested updates to entity states
+   * @returns   {Action.StateUpdates}           - Requested updates to entity states
    */
   complete(command, output, entities) {
     return this[_complete](this[_actor], command, output, entities) || {};
+  }
+
+  /**
+   * Trigger reactions to this action
+   * @param     {EngineCore.Command}  command   - Command being performed
+   * @param     {EngineCore.Output}   output    - Game output
+   * @param     {Action.Entities}     entities  - Current/effective entities
+   * @param     {string}              phase     - Phase of triggering action
+   * @returns   {Action.StateUpdates}           - Requested updates to entity states
+   */
+  triggerReactions(command, output, entities, phase) {
+    const trigger = { type: 'action', verb: this[_verbs][0], phase };
+    const reactions = [].concat(
+      entities.game.getReactions(trigger),
+      entities.player.getReactions(trigger),
+      entities.locations.getReactions(trigger),
+      entities.objects.getReactions(trigger)
+    );
+    const updates = reactions.map(reaction => reaction.action.perform(command, output, entities));
+    return this.mergeUpdates(...updates);
+  }
+
+  /**
+   * Merge state updates together
+   * @param     {Action.StateUpdates[]} updates - Requested updates to entity states
+   * @param     {Action.StateUpdates}           - Merged requested updates to entity states
+   */
+  mergeUpdates(...updates) {
+    return updates.reduce((mergedUpdates, update) => {
+      mergedUpdates.abort = mergedUpdates.abort || update.abort;
+      mergedUpdates.game = Object.assign(mergedUpdates.game, update.game || {});
+      mergedUpdates.player = Object.assign(mergedUpdates.player, update.player || {});
+      Object.keys(update.locations || {}).forEach(id => {
+        mergedUpdates.locations[id] = Object.assign(mergedUpdates.locations[id] || {}, update.locations[id]);
+      });
+      Object.keys(update.objects || {}).forEach(id => {
+        mergedUpdates.objects[id] = Object.assign(mergedUpdates.objects[id] || {}, update.objects[id]);
+      });
+      return mergedUpdates;
+    }, { game: {}, player: {}, locations: {}, objects: {} });
+  }
+
+  /**
+   * Update entity statuses
+   * @param     {Action.Entities}       entities  - Current/effective game entities
+   * @param     {Action.StatusUpdates}  updates   - Requested updates to entities
+   * @returns   {Action.Entities}                 - Updated game entities
+   */
+  updateEntities(entities, updates) {
+    Object.keys(updates.game || {}).forEach(key => { entities.game.updateState(key, updates.game[key]); });
+    Object.keys(updates.player || {}).forEach(key => { entities.player.updateState(key, updates.player[key]); });
+    Object.keys(updates.locations || {}).forEach(id => {
+      const location = entities.locations.getEntity(id);
+      Object.keys(updates.locations[id]).forEach(key => { location.updateState(key, updates.locations[id][key]); });
+    });
+    Object.keys(updates.objects || {}).forEach(id => {
+      const object = entities.objects.getEntity(id);
+      Object.keys(updates.objects[id]).forEach(key => { object.updateState(key, updates.objects[id][key]); });
+    });
+    return entities;
   }
 
   /**

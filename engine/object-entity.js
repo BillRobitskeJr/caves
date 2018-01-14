@@ -51,7 +51,8 @@ export default class ObjectEntity extends Entity {
       name: this.name,
       tags: this.tags,
       states: this.states,
-      actions: this.actions
+      actions: this.actions,
+      reactions: this.reactions
     });
   }
 }

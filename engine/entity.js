@@ -6,12 +6,14 @@
  */
 
 import Action from './action.js'
+import Reaction from './reaction.js'
 
 // Symbols for semi-private members
 const _type = Symbol('type');
 const _id = Symbol('id');
 const _states = Symbol('states');
 const _actions = Symbol('actions');
+const _reactions = Symbol('reactions');
 
 /**
  * Game entity class
@@ -44,6 +46,7 @@ export default class Entity {
       return states;
     }, this[_states] || {});
     this[_actions] = (config.actions || []).map(action => action instanceof Action ? action.cloneForActor(this) : new Action(this, action));
+    this[_reactions] = (config.reactions || []).map(reaction => reaction instanceof Reaction ? reaction.cloneForReactor(this) : new Reaction(this, reaction));
   }
 
   /**
@@ -79,7 +82,7 @@ export default class Entity {
    */
   updateState(key, value, requester) {
     if (!this[_states].hasOwnProperty(key)) this[_states][key] = { isImmutable: false, value: null };
-    if (requester === this || !this[_states][key].isImmutable) this[_states][key] = value;
+    if (requester === this || !this[_states][key].isImmutable) this[_states][key].value = value;
   }
 
   /**
@@ -102,6 +105,21 @@ export default class Entity {
   getAction(verb) { return this[_actions].find(action => verb.match(action.verbExpression) !== null); }
 
   /**
+   * @property  {Reaction[]}  reactions - Reactions performable by this entity
+   * @readonly
+   */
+  get reactions() { return Array.from(this[_reactions]); }
+
+  /**
+   * Get this entity's reactions associated with a trigger
+   * @param     {Reaction.Trigger}  trigger   - Trigger of the desired reactions
+   * @returns   {Reaction[]}                  - Reactions associated with this trigger
+   */
+  getReactions(trigger) {
+    return this[_reactions].filter(reaction => reaction.trigger.type === trigger.type && ((trigger.type === 'action' && reaction.trigger.verb === trigger.verb && reaction.trigger.phase === trigger.phase) || (trigger.type === 'statusUpdate' && reaction.trigger.key === trigger.key)));
+  }
+
+  /**
    * Create a copy of this entity
    * @returns   {Entity}  - New copy of this entity
    */
@@ -111,7 +129,8 @@ export default class Entity {
       id: this[_id],
       states: Object.keys(this[_states])
                     .map(key => ({ key, isImmutable: this[_states][key].isImmutable, value: this[_states][key].value })),
-      actions: this[_actions]
+      actions: this[_actions],
+      reactions: this[_reactions]
     });
   }
 }

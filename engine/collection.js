@@ -58,6 +58,12 @@ export default class Collection {
     return Object.keys(this[_entities]).map(id => this[_entities][id]).filter(test);
   }
 
+  getReactions(trigger) {
+    return Object.keys(this[_entities])
+                 .map(id => this[_entities][id])
+                 .reduce((reactions, entity) => reactions.concat(entity.getReactions(trigger)), []);
+  }
+
   /**
    * Create a copy of this collection and it's entities
    * @returns   {Collection}  - New copy of this collection
