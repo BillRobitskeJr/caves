@@ -18,7 +18,7 @@ export default {
         console.log(`game~complete:`, entities);
         const location = entities.locations.getEntity(entities.player.getState('location'));
         const exits = location ? (location.getState('exits') || []).map(exit => exit.direction) : [];
-        const objects = entities.objects.findEntities(object => object.getState('location') === location.id).map(object => `   ${object.name}`);
+        const objects = location ? entities.objects.findEntities(object => object.getState('location') === location.id).map(object => `   ${object.name}`) : [];
         output.print(`You are ${location ? location.name : 'nowhere'}.`);
         output.print(`You can go: ${exits.length > 0 ? exits.join(', ') : 'nowhere'}`);
         output.print(`You can see:`);

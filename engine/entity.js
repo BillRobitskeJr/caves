@@ -76,13 +76,27 @@ export default class Entity {
 
   /**
    * Request an update a state value of this entity
-   * @param     {string}  key         - Key name of the desired state
-   * @param     {*}       value       - Desired new value for this state
-   * @param     {Entity}  requester   - Entity requesting this change
+   * @param     {string}  key               - Key name of the desired state
+   * @param     {*}       value             - Desired new value for this state
+   * @param     {Entity}  requester         - Entity requesting this change
+   * @param     {boolean} triggerReactions  - This update should trigger reactions to the change
+   * @param     {}
    */
-  updateState(key, value, requester) {
+  updateState(key, value, requester, reactionDetails) {
+    console.log(`Entity#updateState(key, value, requester, reactionDetails):`, key, value, requester, reactionDetails);
     if (!this[_states].hasOwnProperty(key)) this[_states][key] = { isImmutable: false, value: null };
-    if (requester === this || !this[_states][key].isImmutable) this[_states][key].value = value;
+    if (requester !== this && this[_states][key].isImmutable) return {};
+    this[_states][key].value = value;
+    if (!reactionDetails) return {};
+    const command = reactionDetails[0];
+    const output = reactionDetails[1];
+    const entities = reactionDetails[2];
+    if (this.type === 'game' || this.type === 'player' ) entities[this.type].updateState(key, value, entities[this.type]);
+    if (this.type === 'location' || this.type === 'object') entities[`${this.type}s`].getEntity(this.id).updateState(key, value, entities[`${this.type}s`].getEntity(this.id));
+    var reactions = this.getReactions({ type: 'stateUpdate', key });
+    if (reactions.length < 1) return {};
+    console.log(reactions[0].action.perform);
+    return reactions[0].action.perform(...reactionDetails);
   }
 
   /**
@@ -116,7 +130,7 @@ export default class Entity {
    * @returns   {Reaction[]}                  - Reactions associated with this trigger
    */
   getReactions(trigger) {
-    return this[_reactions].filter(reaction => reaction.trigger.type === trigger.type && ((trigger.type === 'action' && reaction.trigger.verb === trigger.verb && reaction.trigger.phase === trigger.phase) || (trigger.type === 'statusUpdate' && reaction.trigger.key === trigger.key)));
+    return this[_reactions].filter(reaction => reaction.trigger.type === trigger.type && ((trigger.type === 'action' && reaction.trigger.verb === trigger.verb && reaction.trigger.phase === trigger.phase) || (trigger.type === 'stateUpdate' && reaction.trigger.key === trigger.key)));
   }
 
   /**

@@ -178,18 +178,86 @@ export default class EngineCore {
       console.log(`EngineCore#performPlayerCommand~updates:`, updates);
 
       // Apply final state updates to game entities
-      Object.keys(updates.game).forEach(key => { this[_game].updateState(key, updates.game[key], command.actor); });
-      Object.keys(updates.player).forEach(key => { this[_player].updateState(key, updates.player[key], command.actor); });
-      Object.keys(updates.locations).forEach(id => {
-        const location = this[_locations].getEntity(id);
-        if (location) Object.keys(updates.locations[id]).forEach(key => { location.updateState(key, updates.locations[id][key], command.actor); });
-      });
-      Object.keys(updates.objects).forEach(id => {
-        const object = this[_objects].getEntity(id);
-        if (object) Object.keys(updates.objects[id]).forEach(key => { object.updateState(key, updates.objects[id][key], command.actor); });
-      });
+      const reactionDetails = [
+        command,
+        this[_mainOutput],
+        {
+          game: this[_game].clone(),
+          player: this[_player].clone(),
+          locations: this[_locations].clone(),
+          objects: this[_objects].clone()
+        }
+      ];
+      // Object.keys(updates.game).forEach(key => { this[_game].updateState(key, updates.game[key], command.actor, reactionDetails); });
+      // Object.keys(updates.player).forEach(key => { this[_player].updateState(key, updates.player[key], command.actor, reactionDetails); });
+      // Object.keys(updates.locations).forEach(id => {
+      //   const location = this[_locations].getEntity(id);
+      //   if (location) Object.keys(updates.locations[id]).forEach(key => { location.updateState(key, updates.locations[id][key], command.actor, reactionDetails); });
+      // });
+      // Object.keys(updates.objects).forEach(id => {
+      //   const object = this[_objects].getEntity(id);
+      //   if (object) Object.keys(updates.objects[id]).forEach(key => { object.updateState(key, updates.objects[id][key], command.actor, reactionDetails); });
+      // });
+      this.updateEntityStates(updates, command.actor, reactionDetails);
     } else {
       this[_mainOutput].print(`You don't know how to do that!`, 'error');
     }
+  }
+
+  /**
+   * Merge state updates together
+   * @param     {Action.StateUpdates[]} updates - Requested updates to entity states
+   * @param     {Action.StateUpdates}           - Merged requested updates to entity states
+   */
+  mergeUpdates(...updates) {
+    return updates.reduce((mergedUpdates, update) => {
+      mergedUpdates.abort = !!mergedUpdates.abort || !!update.abort;
+      mergedUpdates.game = Object.assign(mergedUpdates.game, update.game || {});
+      mergedUpdates.player = Object.assign(mergedUpdates.player, update.player || {});
+      Object.keys(update.locations || {}).forEach(id => {
+        mergedUpdates.locations[id] = Object.assign(mergedUpdates.locations[id] || {}, update.locations[id]);
+      });
+      Object.keys(update.objects || {}).forEach(id => {
+        mergedUpdates.objects[id] = Object.assign(mergedUpdates.objects[id] || {}, update.objects[id]);
+      });
+      return mergedUpdates;
+    }, { game: {}, player: {}, locations: {}, objects: {} });
+  }
+
+  /**
+   * Update entity states
+   * @param     {Action.StatusUpdates}  updates   - Requested updates to entities
+   * @returns   {Action.StatusUpdates}            - Updated game entities
+   */
+  updateEntityStates(updates, requester, reactionDetails) {
+    const gameUpdates = Object.keys(updates.game || {}).reduce((gameUpdates, key) => this.mergeUpdates(gameUpdates, this[_game].updateState(key, updates.game[key], requester, reactionDetails)), {});
+    const playerUpdates = Object.keys(updates.player || {}).reduce((playerUpdates, key) => this.mergeUpdates(playerUpdates, this[_player].updateState(key, updates.player[key], requester, reactionDetails)), {});
+
+    // Object.keys(updates.game || {}).forEach(key => { entities.game.updateState(key, updates.game[key]); });
+    // Object.keys(updates.player || {}).forEach(key => { entities.player.updateState(key, updates.player[key]); });
+
+    const locationUpdates = Object.keys(updates.locations || {}).reduce((locationUpdates, id) => {
+      const location = this[_locations].getEntity(id);
+      return this.mergeUpdates(locationUpdates, Object.keys(updates.locations[id]).reduce((_locationUpdates, key) => this.mergeUpdates(_locationUpdates, location.updateState(key, updates.locations[id][key], requester, reactionDetails)), {}));
+    }, {});
+    const objectUpdates = Object.keys(updates.objects || {}).reduce((objectUpdates, id) => {
+      const object = this[_objects].getEntity(id);
+      return this.mergeUpdates(objectUpdates, Object.keys(updates.objects[id]).reduce((_objectUpdates, key) => this.mergeUpdates(_objectUpdates, object.updateState(key, updates.objects[id][key], requester, reactionDetails)), {}));
+    }, {});
+    
+    // Object.keys(updates.locations || {}).forEach(id => {
+    //   const location = entities.locations.getEntity(id);
+    //   Object.keys(updates.locations[id]).forEach(key => { location.updateState(key, updates.locations[id][key]); });
+    // });
+    // Object.keys(updates.objects || {}).forEach(id => {
+    //   const object = entities.objects.getEntity(id);
+    //   Object.keys(updates.objects[id]).forEach(key => { object.updateState(key, updates.objects[id][key]); });
+    // });
+
+    const nextUpdates = this.mergeUpdates(gameUpdates, playerUpdates, locationUpdates, objectUpdates);
+    if (Object.keys(nextUpdates.game || {}).length > 0 ||
+        Object.keys(nextUpdates.player || {}).length > 0 ||
+        Object.keys(nextUpdates.locations || {}).length > 0 ||
+        Object.keys(nextUpdates.objects || {}).length > 0) this.updateEntityStates(nextUpdates, requester, reactionDetails);
   }
 }

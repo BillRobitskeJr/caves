@@ -86,6 +86,30 @@ export default [
       { key: 'location', value: 4 },
       { key: 'description', isImmutable: true, value: `It is filled with rainwater.` },
       { key: 'isUngettable', isImmutable: true, value: true }
+    ],
+    actions: [
+      {
+        verbs: ['updateBarrelMixture'],
+        start: (actor, command, output, entities) => {},
+        complete: (actor, command, output, entities) => {
+          if (!actor.getState('containsFormula') || !actor.getState('containsSalt')) return {};
+          output.print(`There's an explosion!`, 'story');
+          output.print(`When you come to, you are...\n...somewhere else.`, 'story');
+          return {
+            player: { location: 6 }
+          }
+        }
+      }
+    ],
+    reactions: [
+      {
+        trigger: { type: 'stateUpdate', key: 'containsFormula' },
+        actionVerb: 'updateBarrelMixture'
+      },
+      {
+        trigger: { type: 'stateUpdate', key: 'containsSalt' },
+        actionVerb: 'updateBarrelMixture'
+      }
     ]
   },
   {
