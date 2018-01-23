@@ -85,7 +85,8 @@ export default [
     states: [
       { key: 'location', value: 4 },
       { key: 'description', isImmutable: true, value: `It is filled with rainwater.` },
-      { key: 'isUngettable', isImmutable: true, value: true }
+      { key: 'isUngettable', isImmutable: true, value: true },
+      { key: 'isClimbable', isImmutable: true, value: true }
     ],
     actions: [
       {
@@ -99,6 +100,17 @@ export default [
             player: { location: 6 }
           }
         }
+      },
+      {
+        verbs: ['beClimbed'],
+        start: (actor, command, output, entities) => {},
+        complete: (actor, command, output, entities) => {
+          if (command.object.id !== actor.id) return {};
+          if (command.actor.getState('location') !== actor.getState('location')) return {};
+          output.print(`After standing precariously on the rim of the barrel for a`, 'story');
+          output.print(`moment, you hop back down.`, 'story');
+          return {};
+        }
       }
     ],
     reactions: [
@@ -109,6 +121,10 @@ export default [
       {
         trigger: { type: 'stateUpdate', key: 'containsSalt' },
         actionVerb: 'updateBarrelMixture'
+      },
+      {
+        trigger: { type: 'action', verb: 'climb', phase: 'complete' },
+        actionVerb: 'beClimbed'
       }
     ]
   },
@@ -158,13 +174,81 @@ export default [
   {
     id: 8, name: 'a ladder', tags: ['ladder'],
     states: [
-      { key: 'location', value: 5 }
+      { key: 'location', value: 5 },
+      { key: 'isClimbable', isImmutable: true, value: true }
     ]
   },
   {
     id: 9, name: 'a shovel', tags: ['shovel'],
     states: [
       { key: 'location', value: 5 }
+    ]
+  },
+  {
+    id: 10, name: 'a tree', tags: ['tree'],
+    states: [
+      { key: 'isUngettable', isImmutable: true, value: true },
+      { key: 'location', value: 7 },
+      { key: 'isClimbable', isImmutable: true, value: true }
+    ],
+    actions: [
+      {
+        verbs: ['attemptToBeClimbed'],
+        start: (actor, command, output, entities) => {
+          if (command.object.id !== actor.id) return {};
+          output.print(`You can't quite reach the branches.`, 'story');
+          return { abort: true };
+        },
+        complete: (actor, command, output, entities) => {}
+      }
+    ],
+    reactions: [
+      {
+        trigger: { type: 'action', verb: 'climb', phase: 'start' },
+        actionVerb: 'attemptToBeClimbed'
+      }
+    ]
+  },
+  {
+    id: 11, name: 'a golden sword', tags: ['sword']
+  },
+  {
+    id: 12, name: 'a wooden boat', tags: ['boat'],
+    states: [
+      { key: 'isUngettable', isImmutable: true, value: true },
+      { key: 'location', value: 12 },
+      { key: 'interiorLocation', isImmutable: true, value: 13 }
+    ]
+  },
+  {
+    id: 13, name: 'a magic fan', tags: ['fan'],
+    states: [
+      { key: 'location', value: 8 }
+    ]
+  },
+  {
+    id: 14, name: 'a nasty-looking guard', tags: ['guard'],
+    states: [
+      { key: 'location', value: 16 }
+    ]
+  },
+  {
+    id: 15, name: 'a glass case', tags: ['case'],
+    states: [
+      { key: 'isUngettable', isImmutable: true, value: true },
+      { key: 'location', value: 18 },
+      { key: 'isOpenable', isImmutable: true, value: true },
+      { key: 'contents', value: [16] },
+      { key: 'isClimbable', isImmutable: true, value: true }
+    ]
+  },
+  {
+    id: 16, name: 'a glowing ruby', tags: ['ruby']
+  },
+  {
+    id: 17, name: 'a pair of rubber gloves', tags: ['gloves'],
+    states: [
+      { key: 'location', value: 19 }
     ]
   }
 ];

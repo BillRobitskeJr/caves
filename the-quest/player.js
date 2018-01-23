@@ -273,6 +273,38 @@ export default {
       complete: (actor, command, output, entities) => {
         output.print(`You pour ${command.object.name}.`, 'story');
       }
+    },
+    {
+      verbs: ['jump'],
+      start: (actor, command, output, entities) => {
+        if (command.object) {
+          output.print(`Why...?`, 'error');
+          return { abort: true };
+        }
+        output.print(`You jump into the air!`, 'story');
+        return {};
+      },
+      complete: (actor, command, output, entities) => {
+        return {};
+      }
+    },
+    {
+      verbs: ['climb'],
+      start: (actor, command, output, entities) => {
+        if (!command.predicate && !command.setting.getState('isClimbable')) {
+          output.print(`What do you want to climb?`, 'error');
+          return { abort: true };
+        }
+        if (command.predicate && (!command.object || !command.object.getState('isClimbable'))) {
+          output.print(`You can't climb that!`, 'error');
+          return { abort: true };
+        }
+        return {};
+      },
+      complete: (actor, command, output, entities) => {
+        output.print(`You climb ${command.object ? command.object.name : 'up'}.`, 'story');
+        return {};
+      }
     }
   ]
 };
