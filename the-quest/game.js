@@ -1,42 +1,32 @@
-/**
- * The Quest - Game definition file
- * @copyright   Bill Robitske, Jr. 2018
- * @author      Bill Robitske, Jr. <bill.robitske.jr@gmail.com>
- * @license     MIT
- * 
- * This game configuration is based on the example game, The Quest,
- * from How to Create Adventure Games by Christopher Lampton (1986).
- * Used under Fair Use.
- */
 
 export default {
-  actions: [
-    {
-      verbs: ['showPlayerLocation'],
-      start: (actor, command, output, entities) => { output.clear(); },
-      complete: (actor, command, output, entities) => {
-        console.log(`game~complete:`, entities);
-        const location = entities.locations.getEntity(entities.player.getState('location'));
-        const exits = location ? (location.getState('exits') || []).map(exit => exit.direction) : [];
-        const objects = location ? entities.objects.findEntities(object => object.getState('location') === location.id).map(object => `   ${object.name}`) : [];
-        output.print(`You are ${location ? location.name : 'nowhere'}.`);
-        output.print(`You can go: ${exits.length > 0 ? exits.join(', ') : 'nowhere'}`);
-        output.print(`You can see:`);
-        output.print(objects.length > 0 ? objects.join('\n') : `   nothing of interest`);
-      }
-    },
-    {
-      verbs: ['showPlayerInventory'],
-      start: (actor, command, output, entities) => { output.clear(); },
-      complete: (actor, command, output, entities) => {
-        const inventory = (entities.player.getState('inventory') || [])
-          .map(id => entities.objects.getEntity(id))
-          .map(object => `   ${object.name}`);
-        output.print(`You are carrying:`);
-        output.print(inventory.length > 0 ? inventory.join('\n') : `   nothing`);
-        const maxCarry = entities.player.getState('maxCarry') || 0;
-        if (maxCarry) output.print(`You can carry ${maxCarry - inventory.length} more.`);
-      }
-    }
+  name: 'The Quest',
+  menuScreen: [
+    `&#xE097;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0AB;`,
+    `&#xE095;&#xE095;                                                            &#xE0AA;&#xE0AA;`,
+    `&#xE095;&#xE095;                                                            &#xE0AA;&#xE0AA;`,
+    `&#xE095;&#xE095;                                                            &#xE0AA;&#xE0AA;`,
+    `&#xE095;&#xE095;                                                            &#xE0AA;&#xE0AA;`,
+    `&#xE095;&#xE095;                     -=- THE QUEST -=-                      &#xE0AA;&#xE0AA;`,
+    `&#xE095;&#xE095;                                                            &#xE0AA;&#xE0AA;`,
+    `&#xE095;&#xE095;                                                            &#xE0AA;&#xE0AA;`,
+    `&#xE095;&#xE095;                                                            &#xE0AA;&#xE0AA;`,
+    `&#xE095;&#xE095;      [Start] a new game           [Load] a saved game      &#xE0AA;&#xE0AA;`,
+    `&#xE095;&#xE095;                                                            &#xE0AA;&#xE0AA;`,
+    `&#xE095;&#xE095;           Copyright (c) Bill Robitske, Jr. 2018            &#xE0AA;&#xE0AA;`,
+    `&#xE095;&#xE095;      Based on sample game in "How to Create Adventure      &#xE0AA;&#xE0AA;`,
+    `&#xE095;&#xE095;            Games" by Christopher Lampton (1986)            &#xE0AA;&#xE0AA;`,
+    `&#xE0B5;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0BA;`
+  ],
+  openingScreens: [
+    [
+    //'----=----1----=----2----=----3-|--=----4----=----5----=----6----'
+      `Your uncle was a storyteller.  Since you were a kid, he always`,
+      `had a new tale to share each time you saw him.  So fantastic`,
+      `were his stories, that he had earned the nickname Crazy Uncle`,
+      `Paul from your cousins.  Crazy or not, you never cared.  His`,
+      `tellings of kings and miracles were so vivid, you would lose`,
+      `yourself in them every time.`
+    ]
   ]
-};
+}
