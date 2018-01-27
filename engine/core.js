@@ -7,6 +7,7 @@
 
 import GameEntity from './game-entity.js';
 import Collection from './collection.js';
+import Command from './command.js';
 import PlayerEntity from './player-entity.js';
 import LocationEntity from './location-entity.js';
 
@@ -90,6 +91,17 @@ export default class CavesEngine {
 
   handleGameInput(input) {
     if (DEBUG) console.log(`CavesEngine#handleGameInput("${input}")`);
+    const command = Command.parse(input);
+    if (!command) return;
+    if (command.verb.match(/save/i)) {
+      this._state = STATE_SAVING;
+    } else {
+      const output = this._gameEntity.player.perform(command);
+      (output || []).forEach(line => {
+        this._outputs.main.print(line);
+      });
+      this.displayGameTurnStart();
+    }
   }
 
   handleEndingInput(input) {
