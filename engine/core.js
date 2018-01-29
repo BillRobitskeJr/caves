@@ -74,6 +74,7 @@ export default class CavesEngine {
       this.startOpening();
     } else if (input.match(/load/i)) {
       this._state = STATE_LOADING;
+      this.displayLoadingScreen();
     } else {
       this.displayMenu();
     }
@@ -110,6 +111,15 @@ export default class CavesEngine {
 
   handleLoadingInput(input) {
     if (DEBUG) console.log(`CavesEngine#handleLoadingInput("${input}")`);
+    const loadCommmand = input.match(/load\s+(\d)/i);
+    if (input.match(/return/i)) {
+      this._state = STATE_MENU;
+      this.displayMenu();
+    } else if (!loadCommmand) {
+      this.displayLoadingScreen();
+    } else {
+
+    }
   }
 
   handleSavingInput(input) {
@@ -138,5 +148,22 @@ export default class CavesEngine {
     this._outputs.location.print(this._gameEntity.locationScreen);
     this._outputs.player.clear();
     this._outputs.player.print(this._gameEntity.playerScreen);
+  }
+
+  displayLoadingScreen() {
+    const saves = [];
+    this._outputs.main.clear();
+    this._outputs.main.print(`&#xE097;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0AB;`);
+    this._outputs.main.print(`&#xE095;&#xE095;                                                            &#xE0AA;&#xE0AA;`);
+    this._outputs.main.print(`&#xE095;&#xE095;                         SAVED GAMES                        &#xE0AA;&#xE0AA;`);
+    this._outputs.main.print(`&#xE095;&#xE095;                                                            &#xE0AA;&#xE0AA;`);
+    for (let i = 0; i < 8; ++i) {
+      const save = saves[i];
+      const saveMessage = save ? `${save.date.toLocaleString()}` : 'Empty';
+      this._outputs.main.print(`&#xE095;&#xE095; [load ${i+1}] ${saveMessage.padEnd(49)} &#xE0AA;&#xE0AA;`);
+    }
+    this._outputs.main.print(`&#xE095;&#xE095; [return] Return to Title                                   &#xE0AA;&#xE0AA;`);
+    this._outputs.main.print(`&#xE095;&#xE095;                                                            &#xE0AA;&#xE0AA;`);
+    this._outputs.main.print(`&#xE0B5;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0BA;`);
   }
 }

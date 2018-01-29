@@ -27,7 +27,7 @@ export default class Command {
   get prepositionalPhrases() { return this._prepositionalPhrases; }
 
   static parse(input = '') {
-    const splitInput = input.split(/\s+/g);
+    const splitInput = input.toLowerCase().split(/\s+/g);
     if (splitInput.length === 0 || splitInput[0].trim() === '') return null;
     if (splitInput.length === 1) return new Command(splitInput[0].trim());
     let nounPhrase = [];

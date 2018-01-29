@@ -46,8 +46,9 @@ const ACTIONS = [
     verbs: ['go'],
     start: (actor, command, game) => {
       const direction = command.nounPhrase;
-      if (actor.location.exits.find(exit => exit.direction === direction)) {
-        return { output: [`You head ${direction}...`] };
+      const exit = actor.location.exits.find(exit => exit.direction === direction);
+      if (exit) {
+        return { output: [ exit.transition || `You head ${direction}...`] };
       } else {
         return { stop: true, output: [`You can't go that way!`] };
       }

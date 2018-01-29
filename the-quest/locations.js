@@ -17,8 +17,8 @@ export default [
   {
     id: 3, name: 'in the garage',
     exits: [
-      { direction: 'north', destination: 8 },
-      { direction: 'south', destination: 7 },
+      { direction: 'north', destination: 8, transition: `You exit through the back door.` },
+      { direction: 'south', destination: 7, transition: `You step out through the open garage door.` },
       { direction: 'east', destination: 2 }
     ]
   },
@@ -44,14 +44,14 @@ export default [
     id: 7, name: 'in the front yard',
     exits: [
       { direction: 'north', destination: 9 },
-      { direction: 'west', destination: 3 }
+      { direction: 'west', destination: 3, transition: `You head around the west side of the house.` }
     ]
   },
   {
     id: 8, name: 'in the back yard',
     exits: [
       { direction: 'south', destination: 2 },
-      { direction: 'west', destination: 3 }
+      { direction: 'west', destination: 3, transition: `You head around the west side of the house.` }
     ]
   },
   {
