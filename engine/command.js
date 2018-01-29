@@ -31,22 +31,28 @@ export default class Command {
     if (splitInput.length === 0 || splitInput[0].trim() === '') return null;
     if (splitInput.length === 1) return new Command(splitInput[0].trim());
     let nounPhrase = [];
-    let prepositionalPhrase = [];
+    let prepositionalPhrase = null;
     let prepositionalPhrases = [];
     splitInput.slice(1).forEach(word => {
       if (PREPOSITIONS.indexOf(word) !== -1) {
-        if (prepositionalPhrase.length > 0) {
-          prepositionalPhrases.push(prepositionalPhrase.join(' '));
-          prepositionalPhrase = [];
+        if (prepositionalPhrase) {
+          prepositionalPhrases.push({
+            preposition: prepositionalPhrase.preposition,
+            nounPhrase: prepositionalPhrase.nounPhrase.join(' ')
+          });
+          prepositionalPhrase = null;
         }
-        prepositionalPhrase.push(word);
-      } else if (prepositionalPhrase.length > 0) {
-        prepositionalPhrase.push(word);
+        prepositionalPhrase = { preposition: word, nounPhrase: [] };
+      } else if (prepositionalPhrase) {
+        prepositionalPhrase.nounPhrase.push(word);
       } else {
         nounPhrase.push(word);
       }
     });
-    if (prepositionalPhrase.length > 0) prepositionalPhrases.push(prepositionalPhrase.join(' '));
+    if (prepositionalPhrase) prepositionalPhrases.push({
+      preposition: prepositionalPhrase.preposition,
+      nounPhrase: prepositionalPhrase.nounPhrase.join(' ')
+    });
     return new Command(splitInput[0].trim(), nounPhrase.join(' '), prepositionalPhrases);
   }
 }

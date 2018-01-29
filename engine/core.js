@@ -93,6 +93,7 @@ export default class CavesEngine {
   handleGameInput(input) {
     if (DEBUG) console.log(`CavesEngine#handleGameInput("${input}")`);
     const command = Command.parse(input);
+    if (DEBUG) console.log(`CavesEngine#handleGameInput~command:`, command);
     if (!command) return;
     if (command.verb.match(/save/i)) {
       this._state = STATE_SAVING;
