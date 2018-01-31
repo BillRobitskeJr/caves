@@ -5,17 +5,17 @@ export default class LocationEntity extends Entity {
 
   constructor(config = {}) {
     super(config);
-    this._id = config.id || 0;
-    this._name = config.name || 'nowhere';
-    this._exits = config.exits || [];
-    this._contents = config.contents || [];
+    this.setState('id', config.id || 0);
+    this.setState('name', config.name || 'nowhere');
+    this.setState('exits', config.exits || []);
+    this.setState('contents', config.contents || []);
   }
 
-  get id() { return this._id; }
+  get id() { return this.getState('id'); }
 
-  get name() { return this._name; }
+  get name() { return this.getState('name'); }
 
-  get exits() { return this._exits; }
+  get exits() { return this.getState('exits'); }
 
-  get contents() { return this._contents; }
+  get contents() { return this.getState('contents'); }
 }

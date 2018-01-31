@@ -9,21 +9,21 @@ export default class PlayerEntity extends Entity {
   constructor(config, game) {
     super(config);
     this._game = game;
-    this._inventory = [];
-    this._maxCarry = config.maxCarry || 0;
-    this._location = config.location || 1;
+    this.setState('inventory', []);
+    this.setState('maxCarry', config.maxCarry || 0);
+    this.setState('location', config.location || 1);
     this._actions = ACTIONS.concat(config.actions || []).map(action => new Action(action));
   }
 
-  get inventory() { return this._inventory; }
+  get inventory() { return this.getState('inventory'); }
 
-  get maxCarry() { return this._maxCarry; }
+  get maxCarry() { return this.getState('maxCarry'); }
 
-  get location() { return this._game.locations.getByID(this._location); }
+  get location() { return this._game.locations.getByID(this.getState('location')); }
 
   set location(value) {
     if (!(value instanceof LocationEntity)) throw new TypeError(`Value is not an instance of LocationEntity.`);
-    this._location = value.id;
+    this.setState('location', value.id);
   }
 
   perform(command) {

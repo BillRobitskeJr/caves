@@ -65,4 +65,17 @@ export default class GameEntity extends Entity {
     this._currentOpeningPage++;
     return this._currentOpeningPage >= this._openingScreens.length;
   }
+
+  serialize() {
+    const states = {
+      game: super.serialize(),
+      player: this._playerEntity.serialize()
+    };
+    return states;
+  }
+
+  deserialize(states) {
+    super.deserialize(states.game);
+    this._playerEntity.deserialize(states.player);
+  }
 }

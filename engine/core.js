@@ -60,10 +60,11 @@ export default class CavesEngine {
     this.displayOpening();
   }
 
-  startGame() {
+  startGame(states) {
     this._state = STATE_GAME;
     this._gameEntity.player = new PlayerEntity(this._config.player, this._gameEntity);
     this._gameEntity.locations = new Collection(this._config.locations.map(config => new LocationEntity(config, this._gameEntity)));
+    if (states) this._gameEntity.deserialize(states);
     this._outputs.main.clear();
     this.displayGameTurnStart();
   }
@@ -97,6 +98,7 @@ export default class CavesEngine {
     if (!command) return;
     if (command.verb.match(/save/i)) {
       this._state = STATE_SAVING;
+      this.displaySavingScreen();
     } else {
       const output = this._gameEntity.player.perform(command);
       (output || []).forEach(line => {
@@ -112,19 +114,38 @@ export default class CavesEngine {
 
   handleLoadingInput(input) {
     if (DEBUG) console.log(`CavesEngine#handleLoadingInput("${input}")`);
-    const loadCommmand = input.match(/load\s+(\d)/i);
+    const loadCommand = input.match(/load\s+(\d)/i);
     if (input.match(/return/i)) {
       this._state = STATE_MENU;
       this.displayMenu();
-    } else if (!loadCommmand) {
+    } else if (!loadCommand) {
       this.displayLoadingScreen();
     } else {
-
+      const saves = JSON.parse(localStorage.getItem('saves') || '[]');
+      const id = parseInt(loadCommand[1]) - 1;
+      this.startGame(saves[id].states);
     }
   }
 
   handleSavingInput(input) {
     if (DEBUG) console.log(`CavesEngine#handleSavingInput("${input}")`);
+    const saveCommand = input.match(/save\s+(\d)/i);
+    if (input.match(/return/i)) {
+      this._state = STATE_GAME;
+      this.displayGameTurnStart();
+    } else if (!saveCommand) {
+      this.displaySavingScreen();
+    } else {
+      const saves = JSON.parse(localStorage.getItem('saves') || '[]');
+      const id = parseInt(saveCommand[1]) - 1;
+      const states = this._gameEntity.serialize();
+      console.log(`CavesEngine#handleSavingInput~states:`, states);
+      saves[id] = { date: new Date(), states };
+      localStorage.setItem('saves', JSON.stringify(saves));
+      this._state = STATE_GAME;
+      this._outputs.main.clear();
+      this.displayGameTurnStart();
+    }
   }
 
   displayMenu() {
@@ -152,7 +173,7 @@ export default class CavesEngine {
   }
 
   displayLoadingScreen() {
-    const saves = [];
+    const saves = JSON.parse(localStorage.getItem('saves') || '[]');
     this._outputs.main.clear();
     this._outputs.main.print(`&#xE097;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0AB;`);
     this._outputs.main.print(`&#xE095;&#xE095;                                                            &#xE0AA;&#xE0AA;`);
@@ -160,10 +181,29 @@ export default class CavesEngine {
     this._outputs.main.print(`&#xE095;&#xE095;                                                            &#xE0AA;&#xE0AA;`);
     for (let i = 0; i < 8; ++i) {
       const save = saves[i];
-      const saveMessage = save ? `${save.date.toLocaleString()}` : 'Empty';
+      const date = save ? new Date(save.date) : null;
+      const saveMessage = save ? `${date.toLocaleString()}` : 'Empty';
       this._outputs.main.print(`&#xE095;&#xE095; [load ${i+1}] ${saveMessage.padEnd(49)} &#xE0AA;&#xE0AA;`);
     }
     this._outputs.main.print(`&#xE095;&#xE095; [return] Return to Title                                   &#xE0AA;&#xE0AA;`);
+    this._outputs.main.print(`&#xE095;&#xE095;                                                            &#xE0AA;&#xE0AA;`);
+    this._outputs.main.print(`&#xE0B5;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0BA;`);
+  }
+
+  displaySavingScreen() {
+    const saves = JSON.parse(localStorage.getItem('saves') || '[]');
+    this._outputs.main.clear();
+    this._outputs.main.print(`&#xE097;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0AB;`);
+    this._outputs.main.print(`&#xE095;&#xE095;                                                            &#xE0AA;&#xE0AA;`);
+    this._outputs.main.print(`&#xE095;&#xE095;                         SAVED GAMES                        &#xE0AA;&#xE0AA;`);
+    this._outputs.main.print(`&#xE095;&#xE095;                                                            &#xE0AA;&#xE0AA;`);
+    for (let i = 0; i < 8; ++i) {
+      const save = saves[i];
+      const date = save ? new Date(save.date) : null;
+      const saveMessage = save ? `${date.toLocaleString()}` : 'Empty';
+      this._outputs.main.print(`&#xE095;&#xE095; [save ${i+1}] ${saveMessage.padEnd(49)} &#xE0AA;&#xE0AA;`);
+    }
+    this._outputs.main.print(`&#xE095;&#xE095; [return] Return to game                                    &#xE0AA;&#xE0AA;`);
     this._outputs.main.print(`&#xE095;&#xE095;                                                            &#xE0AA;&#xE0AA;`);
     this._outputs.main.print(`&#xE0B5;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0BA;`);
   }
