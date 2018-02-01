@@ -71,9 +71,9 @@ export default class CavesEngine {
 
   handleMenuInput(input = "") {
     if (DEBUG) console.log(`CavesEngine#handleMenuInput("${input}")`);
-    if (input.match(/start/i)) {
+    if (input.trim().match(/^start$/i)) {
       this.startOpening();
-    } else if (input.match(/load/i)) {
+    } else if (input.trim().match(/^load$/i)) {
       this._state = STATE_LOADING;
       this.displayLoadingScreen();
     } else {
@@ -93,16 +93,16 @@ export default class CavesEngine {
 
   handleGameInput(input) {
     if (DEBUG) console.log(`CavesEngine#handleGameInput("${input}")`);
-    const command = Command.parse(input);
-    if (DEBUG) console.log(`CavesEngine#handleGameInput~command:`, command);
-    if (!command) return;
-    if (command.verb.match(/save/i)) {
+    if (input.trim().match(/^save$/i)) {
       this._state = STATE_SAVING;
       this.displaySavingScreen();
-    } else if (command.verb.match(/quit/i)) {
+    } else if (input.trim().match(/^quit$/i)) {
       this._state = STATE_MENU;
       this.displayMenu();
     } else {
+      const command = Command.parse(input);
+      if (DEBUG) console.log(`CavesEngine#handleGameInput~command:`, command);
+      if (!command) return;
       const output = this._gameEntity.player.perform(command);
       (output || []).forEach(line => {
         this._outputs.main.print(line);
@@ -117,8 +117,8 @@ export default class CavesEngine {
 
   handleLoadingInput(input) {
     if (DEBUG) console.log(`CavesEngine#handleLoadingInput("${input}")`);
-    const loadCommand = input.match(/load\s+(\d)/i);
-    if (input.match(/return/i)) {
+    const loadCommand = input.trim().match(/^load\s+(\d)$/i);
+    if (input.trim().match(/^return$/i)) {
       this._state = STATE_MENU;
       this.displayMenu();
     } else if (!loadCommand) {
@@ -132,8 +132,8 @@ export default class CavesEngine {
 
   handleSavingInput(input) {
     if (DEBUG) console.log(`CavesEngine#handleSavingInput("${input}")`);
-    const saveCommand = input.match(/save\s+(\d)/i);
-    if (input.match(/return/i)) {
+    const saveCommand = input.trim().match(/^save\s+(\d)$/i);
+    if (input.trim().match(/^return$/i)) {
       this._state = STATE_GAME;
       this.displayGameTurnStart();
     } else if (!saveCommand) {
