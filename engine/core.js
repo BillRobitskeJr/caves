@@ -99,6 +99,9 @@ export default class CavesEngine {
     if (command.verb.match(/save/i)) {
       this._state = STATE_SAVING;
       this.displaySavingScreen();
+    } else if (command.verb.match(/quit/i)) {
+      this._state = STATE_MENU;
+      this.displayMenu();
     } else {
       const output = this._gameEntity.player.perform(command);
       (output || []).forEach(line => {
@@ -149,6 +152,8 @@ export default class CavesEngine {
   }
 
   displayMenu() {
+    this._outputs.location.clear();
+    this._outputs.player.clear();
     const menu = this._gameEntity.menuScreen;
     this._outputs.main.clear();
     menu.forEach(line => {

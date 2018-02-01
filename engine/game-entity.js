@@ -69,7 +69,8 @@ export default class GameEntity extends Entity {
   serialize() {
     const states = {
       game: super.serialize(),
-      player: this._playerEntity.serialize()
+      player: this._playerEntity.serialize(),
+      locations: this._locationsCollection.serialize()
     };
     return states;
   }
@@ -77,5 +78,6 @@ export default class GameEntity extends Entity {
   deserialize(states) {
     super.deserialize(states.game);
     this._playerEntity.deserialize(states.player);
+    this._locationsCollection.deserialize(states.locations);
   }
 }
