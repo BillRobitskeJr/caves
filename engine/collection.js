@@ -10,6 +10,14 @@ export default class Collection {
     return this._entities.find(entity => entity.id === id) || null;
   }
 
+  findEntities(filter = () => false) {
+    return this._entities.filter(filter) || [];
+  }
+
+  findEntity(filter = () => false) {
+    return this._entities.find(filter) || null;
+  }
+
   serialize() {
     return this._entities.reduce((states, entity) => {
       states[entity.id] = entity.serialize();

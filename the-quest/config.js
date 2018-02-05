@@ -10,9 +10,11 @@
 import game from './game.js';
 import player from './player.js';
 import locations from './locations.js';
+import objects from './objects.js';
 
 export default {
   game,
   player,
-  locations
+  locations,
+  objects
 };

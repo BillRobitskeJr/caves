@@ -10,6 +10,7 @@ import Collection from './collection.js';
 import Command from './command.js';
 import PlayerEntity from './player-entity.js';
 import LocationEntity from './location-entity.js';
+import ObjectEntity from './object-entity.js';
 
 const DEBUG = true;
 
@@ -32,7 +33,7 @@ export default class CavesEngine {
    */
   constructor(outputs, config) {
     this._outputs = outputs;
-    this._config = config || {
+    this._config = {
       game: config.game || {},
       player: config.player || {},
       locations: config.locations || [],
@@ -64,6 +65,7 @@ export default class CavesEngine {
     this._state = STATE_GAME;
     this._gameEntity.player = new PlayerEntity(this._config.player, this._gameEntity);
     this._gameEntity.locations = new Collection(this._config.locations.map(config => new LocationEntity(config, this._gameEntity)));
+    this._gameEntity.objects = new Collection(this._config.objects.map(config => new ObjectEntity(config, this._gameEntity)));
     if (states) this._gameEntity.deserialize(states);
     this._outputs.main.clear();
     this.displayGameTurnStart();

@@ -10,6 +10,7 @@ export default class GameEntity extends Entity {
     super(config);
     this._playerEntity = null;
     this._locationsCollection = null;
+    this._objectsCollection = null;
     this._menuScreen = config.menuScreen || [];
     this._openingScreens = config.openingScreens || [];
     this._currentOpeningPage = 0;
@@ -27,6 +28,13 @@ export default class GameEntity extends Entity {
   set locations(value) {
     if (!(value instanceof Collection)) throw new TypeError(`Value is not an instance of Collection.`);
     this._locationsCollection = value;
+  }
+
+  get objects() { return this._objectsCollection; }
+
+  set objects(value) {
+    if (!(value instanceof Collection)) throw new TypeError(`Value is not an instance of Collection.`);
+    this._objectsCollection = value;
   }
 
   get menuScreen() { return this._menuScreen; }
