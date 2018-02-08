@@ -9,6 +9,7 @@ import Entity from './entity.js';
 import Command from './command.js';
 import Action from './action.js';
 import LocationEntity from './location-entity.js';
+import ObjectEntity from './object-entity.js';
 
 /**
  * Player entity class
@@ -29,7 +30,36 @@ export default class PlayerEntity extends Entity {
     this._actions = ACTIONS.concat(config.actions || []).map(action => new Action(action));
   }
 
-  get inventory() { return this.getState('inventory'); }
+  /**
+   * @property {ObjectEntity[]} inventory - This entity's currently held objects
+   * @readonly
+   */
+  get inventory() { return this.getState('inventory').map(id => this._game.objects.getByID(id)); }
+
+  /**
+   * Add an object to this player's inventory
+   * @param {ObjectEntity} object - Object to be added
+   */
+  addObjectToInventory(object) {
+    if (!(object instanceof ObjectEntity)) throw new TypeError(`Object to be added must be an instance of ObjectEntity.`);
+    const inventory = this.getState('inventory');
+    if (inventory.indexOf(object.id) !== -1) return;
+    inventory.push(object.id);
+    this.setState('inventory', inventory);
+  }
+
+  /**
+   * Remove an object from this player's inventory
+   * @param {ObjectEntity} object - Object to be removed
+   */
+  removeObjectFromInventory(object) {
+    if (!(object instanceof ObjectEntity)) throw new TypeError(`Object to be removed must be an instance of ObjectEntity.`);
+    const inventory = this.getState('inventory');
+    const index = inventory.indexOf(object.id);
+    if (index === -1) return;
+    inventory.splice(index, 1);
+    this.setState('inventory', inventory);
+  }
 
   /**
    * @property {number} maxCarry - Maximum number of objects this player can carry
