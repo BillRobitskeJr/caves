@@ -41,9 +41,15 @@ export default class ObjectEntity extends Entity {
   get name() { return this.getState('name'); }
 
   /**
+   * @property {RegExp} tagsExpression - Regular expression for matching this object in noun phrases
+   * @readonly
+   */
+  get tagsExpression() { return new RegExp(`^(${this.getState('tags').join('|')})$`, 'i'); }
+
+  /**
    * @property {?LocationEntity} location - Current location of this object
    */
-  get location() { return this._game.locations.getByID(this.getState('location')); }
+  get location() { return this._game.locations.getByID(this.getState('location') || 0); }
   set location(value) {
     if (!(value instanceof LocationEntity) && value !== null) throw new TypeError(`Value is not an instance of LocationEntity or null.`);
     this.setState('location', value ? value.id : null);

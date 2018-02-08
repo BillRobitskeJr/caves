@@ -126,5 +126,22 @@ const ACTIONS = [
       actor.location = destination;
       return [`You are ${destination.name}.`];
     }
+  },
+  {
+    verbs: ['get', 'take'],
+    start: (actor, command, game) => {
+      if (!command.nounPhrase) return { stop: true, output: [`What do you want to get?`] };
+      const object = game.objects.findEntity(object => object.tagsExpression.test(command.nounPhrase));
+      if (!object) return { stop: true, output: [`You can't ${command.verb} that.`] };
+      if (actor.inventory.indexOf(object) !== -1) return { stop: true, output: [`You already have ${object.name}.`] };
+      if (object.location !== actor.location) return { stop: true, output: [`It's not here.`] };
+      return {};
+    },
+    complete: (actor, command, game) => {
+      const object = game.objects.findEntity(object => object.tagsExpression.test(command.nounPhrase));
+      actor.addObjectToInventory(object);
+      object.location = null;
+      return [`You pick up ${object.name}.`];
+    }
   }
 ];

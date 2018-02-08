@@ -50,6 +50,6 @@ export default class LocationEntity extends Entity {
    * @readonly
    */
   get contents() {
-    return this._game.objects.findEntities(object => object.location.id === this.id);
+    return this._game.objects.findEntities(object => object.location && object.location.id === this.id);
   }
 }
