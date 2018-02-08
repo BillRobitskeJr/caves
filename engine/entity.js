@@ -12,7 +12,8 @@ export default class Entity {
 
   /**
    * Create a new game entity
-   * @param {Object} config 
+   * @constructor
+   * @param {Object} config - Entity configuration
    */
   constructor(config = {}) {
     this._states = (config.states || []).reduce((states, state) => {
@@ -41,6 +42,10 @@ export default class Entity {
     this._states[name].value = value;
   }
 
+  /**
+   * Save this entity's current state to a simple object for saving
+   * @returns {Object.<string,*>} - Entity state values
+   */
   serialize() {
     return Object.keys(this._states).reduce((states, name) => {
       if (typeof this._states[name].value !== 'function') states[name] = this._states[name].value;
@@ -48,6 +53,10 @@ export default class Entity {
     }, {});
   }
 
+  /**
+   * Set this entity's current state based on previous serialization
+   * @param {Object.<string,*>} states - Entity state values
+   */
   deserialize(states) {
     Object.keys(states).forEach(name => {
       this.setState(name, states[name]);

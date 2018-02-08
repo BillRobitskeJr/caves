@@ -1,3 +1,9 @@
+/**
+ * The Quest - Game entity configuration
+ * @copyright Bill Robitske, Jr. 2018
+ * @author    Bill Robitske, Jr. <bill.robitske.jr@gmail.com>
+ * @license   MIT
+ */
 
 export default {
   name: 'The Quest',
@@ -24,7 +30,7 @@ export default {
       `Your uncle was a storyteller.  Since you were a kid, he always`,
       `had a new tale to share each time you saw him.  So fantastic`,
       `were his stories, that he had earned the nickname Crazy Uncle`,
-      `Paul from your cousins.  Crazy or not, you never cared.  His`,
+      `Paul from your siblings.  Crazy or not, you never cared.  His`,
       `tellings of kings and miracles were so vivid, you would lose`,
       `yourself in them every time.`
     ]

@@ -53,14 +53,24 @@ export default class CavesEngine {
     this.displayMenu();
   }
 
+  /**
+   * @property {function} handleInput - Current input handler
+   */
   get handleInput() { return this._inputHandlers[this._state].bind(this); }
 
+  /**
+   * Start the game's opening sequence
+   */
   startOpening() {
     this._state = STATE_OPENING;
     this._gameEntity.resetOpening();
     this.displayOpening();
   }
 
+  /**
+   * Start the game's main loop
+   * @param {Object} [states] - Game entity's serialized states
+   */
   startGame(states) {
     this._state = STATE_GAME;
     this._gameEntity.player = new PlayerEntity(this._config.player, this._gameEntity);
@@ -71,6 +81,10 @@ export default class CavesEngine {
     this.displayGameTurnStart();
   }
 
+  /**
+   * Handle player inputs while on the title menu screen
+   * @param {string} input - Player input
+   */
   handleMenuInput(input = "") {
     if (DEBUG) console.log(`CavesEngine#handleMenuInput("${input}")`);
     if (input.trim().match(/^start$/i)) {
@@ -83,6 +97,10 @@ export default class CavesEngine {
     }
   }
 
+  /**
+   * Handle player inputs while in the opening sequence
+   * @param {string} input - Player input
+   */
   handleOpeningInput(input) {
     if (DEBUG) console.log(`CavesEngine#handleOpeningInput("${input}")`);
     const openingComplete = this._gameEntity.advanceOpening();
@@ -93,6 +111,10 @@ export default class CavesEngine {
     }
   }
 
+  /**
+   * Handle player input during the game's main loop
+   * @param {string} input - Player input
+   */
   handleGameInput(input) {
     if (DEBUG) console.log(`CavesEngine#handleGameInput("${input}")`);
     if (input.trim().match(/^save$/i)) {
@@ -113,10 +135,18 @@ export default class CavesEngine {
     }
   }
 
+  /**
+   * Handle player input while in the ending sequence
+   * @param {string} input - Player input
+   */
   handleEndingInput(input) {
     if (DEBUG) console.log(`CavesEngine#handleEndingInput("${input}")`);
   }
 
+  /**
+   * Handle player input while on the loading screen
+   * @param {string} input - Player input
+   */
   handleLoadingInput(input) {
     if (DEBUG) console.log(`CavesEngine#handleLoadingInput("${input}")`);
     const loadCommand = input.trim().match(/^load\s+(\d)$/i);
@@ -132,6 +162,10 @@ export default class CavesEngine {
     }
   }
 
+  /**
+   * Handle player input while on the saving screen
+   * @param {string} input - Player input
+   */
   handleSavingInput(input) {
     if (DEBUG) console.log(`CavesEngine#handleSavingInput("${input}")`);
     const saveCommand = input.trim().match(/^save\s+(\d)$/i);
@@ -153,6 +187,9 @@ export default class CavesEngine {
     }
   }
 
+  /**
+   * Display the game's title menu
+   */
   displayMenu() {
     this._outputs.location.clear();
     this._outputs.player.clear();
@@ -163,6 +200,9 @@ export default class CavesEngine {
     });
   }
 
+  /**
+   * Display the current page of the game's opening sequence
+   */
   displayOpening() {
     const opening = this._gameEntity.openingScreen;
     this._outputs.main.clear();
@@ -172,6 +212,10 @@ export default class CavesEngine {
     this._outputs.main.print(`Press Return to continue...`);
   }
 
+  /**
+   * Update display of player/location information at the start of each
+   * game turn
+   */
   displayGameTurnStart() {
     this._outputs.location.clear();
     this._outputs.location.print(this._gameEntity.locationScreen);
@@ -179,6 +223,9 @@ export default class CavesEngine {
     this._outputs.player.print(this._gameEntity.playerScreen);
   }
 
+  /**
+   * Display the loading screen
+   */
   displayLoadingScreen() {
     const saves = JSON.parse(localStorage.getItem('saves') || '[]');
     this._outputs.main.clear();
@@ -197,6 +244,9 @@ export default class CavesEngine {
     this._outputs.main.print(`&#xE0B5;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0B3;&#xE0BA;`);
   }
 
+  /**
+   * Display the saving screen
+   */
   displaySavingScreen() {
     const saves = JSON.parse(localStorage.getItem('saves') || '[]');
     this._outputs.main.clear();

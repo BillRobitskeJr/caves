@@ -1,4 +1,16 @@
+/**
+ * Caves Engine: Game Command
+ * @copyright Bill Robitske, Jr. 2018
+ * @author    Bill Robitske, Jr. <bill.robitske.jr@gmail.com>
+ * @license   MIT
+ */
 
+/**
+ * Prepositions recognized by the command parser
+ * @type {string[]}
+ * @private
+ * @readonly
+ */
 const PREPOSITIONS = [
   'aboard', 'about', 'above', 'across', 'after', 'against', 'along',
   'alongside', 'amid', 'among', 'around', 'as', 'astride', 'at',
@@ -12,20 +24,53 @@ const PREPOSITIONS = [
   'upside', 'versus', 'via', 'with', 'within', 'without', 'worth'
 ];
 
+/**
+ * Command class
+ */
 export default class Command {
 
+  /**
+   * @typedef {Object} Command.PrepositionalPhrase
+   * @property {string} preposition - Preposition of this phrase
+   * @property {string} nounPhrase - Noun phrase portion of this phrase
+   */
+
+  /**
+   * Create a new command
+   * @constructor
+   * @param {string} verb 
+   * @param {string} nounPhrase 
+   * @param {Command.PrepositionalPhrase[]} prepositionalPhrases 
+   */
   constructor(verb = '', nounPhrase = '', prepositionalPhrases = []) {
     this._verb = verb;
     this._nounPhrase = nounPhrase;
     this._prepositionalPhrases = prepositionalPhrases;
   }
 
+  /**
+   * @property {string} verb - This command's verb
+   * @readonly
+   */
   get verb() { return this._verb; }
 
+  /**
+   * @property {string} nounPhrase - This command's object noun phrase
+   * @readonly
+   */
   get nounPhrase() { return this._nounPhrase; }
 
+  /**
+   * @property {Command.PrepositionalPhrase[]} prepositionalPhrases - This command's prepositional phrases
+   * @readonly
+   */
   get prepositionalPhrases() { return this._prepositionalPhrases; }
 
+  /**
+   * Create a command based on an input statement
+   * @param {string} input - Input statement to parse
+   * @returns {?Command} - Parsed command
+   */
   static parse(input = '') {
     const splitInput = input.toLowerCase().split(/\s+/g);
     if (splitInput.length === 0 || splitInput[0].trim() === '') return null;
