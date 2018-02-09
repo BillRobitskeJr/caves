@@ -143,5 +143,21 @@ const ACTIONS = [
       object.location = null;
       return [`You pick up ${object.name}.`];
     }
+  },
+  {
+    verbs: ['drop'],
+    start: (actor, command, game) => {
+      if (!command.nounPhrase) return { stop: true, output: [`What do you want to drop?`] };
+      const object = game.objects.findEntity(object => object.tagsExpression.test(command.nounPhrase));
+      if (!object) return { stop: true, output: [`You can't drop that.`] };
+      if (actor.inventory.indexOf(object) === -1) return { stop: true, output: [`You don't have that.`] };
+      return {};
+    },
+    complete: (actor, command, game) => {
+      const object = game.objects.findEntity(object => object.tagsExpression.test(command.nounPhrase));
+      actor.removeObjectFromInventory(object);
+      object.location = actor.location;
+      return [`You drop ${object.name}.`];
+    }
   }
 ];
