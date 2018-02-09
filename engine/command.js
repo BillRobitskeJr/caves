@@ -40,12 +40,14 @@ export default class Command {
    * @constructor
    * @param {string} verb 
    * @param {string} nounPhrase 
-   * @param {Command.PrepositionalPhrase[]} prepositionalPhrases 
+   * @param {Command.PrepositionalPhrase[]} prepositionalPhrases
+   * @param {ObjectEntity} nounObject
    */
-  constructor(verb = '', nounPhrase = '', prepositionalPhrases = []) {
+  constructor(verb = '', nounPhrase = '', prepositionalPhrases = [], nounObject = null) {
     this._verb = verb;
     this._nounPhrase = nounPhrase;
     this._prepositionalPhrases = prepositionalPhrases;
+    this._nounObject = nounObject;
   }
 
   /**
@@ -61,6 +63,12 @@ export default class Command {
   get nounPhrase() { return this._nounPhrase; }
 
   /**
+   * @property {string} nounObject - Object entity referenced by this command's noun phrase
+   * @readonly
+   */
+  get nounObject() { return this._nounObject; }
+
+  /**
    * @property {Command.PrepositionalPhrase[]} prepositionalPhrases - This command's prepositional phrases
    * @readonly
    */
@@ -69,9 +77,10 @@ export default class Command {
   /**
    * Create a command based on an input statement
    * @param {string} input - Input statement to parse
+   * @param {GameEntity} game - Current game entity
    * @returns {?Command} - Parsed command
    */
-  static parse(input = '') {
+  static parse(input = '', game = null) {
     const splitInput = input.toLowerCase().split(/\s+/g);
     if (splitInput.length === 0 || splitInput[0].trim() === '') return null;
     if (splitInput.length === 1) return new Command(splitInput[0].trim());
@@ -83,7 +92,8 @@ export default class Command {
         if (prepositionalPhrase) {
           prepositionalPhrases.push({
             preposition: prepositionalPhrase.preposition,
-            nounPhrase: prepositionalPhrase.nounPhrase.join(' ')
+            nounPhrase: prepositionalPhrase.nounPhrase.join(' '),
+            nounObject: game.objects.findEntity(object => tagsExpression.test(prepositionalPhrase.nounPhrase.join(' ')))
           });
           prepositionalPhrase = null;
         }
@@ -96,8 +106,10 @@ export default class Command {
     });
     if (prepositionalPhrase) prepositionalPhrases.push({
       preposition: prepositionalPhrase.preposition,
-      nounPhrase: prepositionalPhrase.nounPhrase.join(' ')
+      nounPhrase: prepositionalPhrase.nounPhrase.join(' '),
+      nounObject: game.objects.findEntity(object => tagsExpression.test(prepositionalPhrase.nounPhrase.join(' ')))
     });
-    return new Command(splitInput[0].trim(), nounPhrase.join(' '), prepositionalPhrases);
+    const nounObject = game.objects.findEntity(object => object.tagsExpression.test(nounPhrase.join(' ')));
+    return new Command(splitInput[0].trim(), nounPhrase.join(' '), prepositionalPhrases, nounObject);
   }
 }

@@ -124,7 +124,7 @@ export default class CavesEngine {
       this._state = STATE_MENU;
       this.displayMenu();
     } else {
-      const command = Command.parse(input);
+      const command = Command.parse(input, this._gameEntity);
       if (DEBUG) console.log(`CavesEngine#handleGameInput~command:`, command);
       if (!command) return;
       const output = this._gameEntity.player.perform(command);

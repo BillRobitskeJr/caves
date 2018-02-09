@@ -131,33 +131,29 @@ const ACTIONS = [
     verbs: ['get', 'take'],
     start: (actor, command, game) => {
       if (!command.nounPhrase) return { stop: true, output: [`What do you want to get?`] };
-      const object = game.objects.findEntity(object => object.tagsExpression.test(command.nounPhrase));
-      if (!object) return { stop: true, output: [`You can't ${command.verb} that.`] };
-      if (actor.inventory.indexOf(object) !== -1) return { stop: true, output: [`You already have ${object.name}.`] };
-      if (object.location !== actor.location) return { stop: true, output: [`It's not here.`] };
+      if (!command.nounObject) return { stop: true, output: [`You can't ${command.verb} that.`] };
+      if (actor.inventory.indexOf(command.nounObject) !== -1) return { stop: true, output: [`You already have ${command.nounObject.name}.`] };
+      if (command.nounObject.location !== actor.location) return { stop: true, output: [`It's not here.`] };
       return {};
     },
     complete: (actor, command, game) => {
-      const object = game.objects.findEntity(object => object.tagsExpression.test(command.nounPhrase));
-      actor.addObjectToInventory(object);
-      object.location = null;
-      return [`You pick up ${object.name}.`];
+      actor.addObjectToInventory(command.nounObject);
+      command.nounObject.location = null;
+      return [`You pick up ${command.nounObject.name}.`];
     }
   },
   {
     verbs: ['drop'],
     start: (actor, command, game) => {
       if (!command.nounPhrase) return { stop: true, output: [`What do you want to drop?`] };
-      const object = game.objects.findEntity(object => object.tagsExpression.test(command.nounPhrase));
-      if (!object) return { stop: true, output: [`You can't drop that.`] };
-      if (actor.inventory.indexOf(object) === -1) return { stop: true, output: [`You don't have that.`] };
+      if (!command.nounObject) return { stop: true, output: [`You can't drop that.`] };
+      if (actor.inventory.indexOf(command.nounObject) === -1) return { stop: true, output: [`You don't have that.`] };
       return {};
     },
     complete: (actor, command, game) => {
-      const object = game.objects.findEntity(object => object.tagsExpression.test(command.nounPhrase));
-      actor.removeObjectFromInventory(object);
-      object.location = actor.location;
-      return [`You drop ${object.name}.`];
+      actor.removeObjectFromInventory(command.nounObject);
+      command.nounObject.location = actor.location;
+      return [`You drop ${command.nounObject.name}.`];
     }
   }
 ];
