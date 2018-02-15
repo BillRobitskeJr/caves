@@ -26,6 +26,7 @@ export default class ObjectEntity extends Entity {
     this.setState('name', config.name || 'nothing');
     this.setState('tags', config.tags || []);
     this.setState('location', config.location || null);
+    this.setState('description', config.description || null);
   }
 
   /**
@@ -39,6 +40,12 @@ export default class ObjectEntity extends Entity {
    * @readonly
    */
   get name() { return this.getState('name'); }
+
+  /**
+   * @property {?string} description - Description of this object
+   * @readonly
+   */
+  get description() { return this.getState('description') || null; }
 
   /**
    * @property {RegExp} tagsExpression - Regular expression for matching this object in noun phrases

@@ -12,10 +12,12 @@ export default [
   },
   {
     id: 2, name: 'a bottle of vinegar', tags: ['vinegar'],
-    location: 2
+    location: 2,
+    description: `The bottle is mostly full.`
   },
   {
     id: 3, name: 'a box of baking soda', tags: ['baking soda'],
-    location: 2
+    location: 2,
+    description: () => `The box appears full.`
   }
 ]

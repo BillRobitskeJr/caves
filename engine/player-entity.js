@@ -155,5 +155,21 @@ const ACTIONS = [
       command.nounObject.location = actor.location;
       return [`You drop ${command.nounObject.name}.`];
     }
+  },
+  {
+    verbs: ['examine', 'inspect'],
+    start: (actor, command, game) => {
+      if (!command.nounPhrase) return { stop: true, output: [`What do you want to ${command.verb}?`] };
+      if (!command.nounObject) return { stop: true, output: [`You can't ${command.verb} that.`] };
+      if (actor.location !== command.nounObject.location && actor.inventory.indexOf(command.nounObject) === -1) return { stop: true, output: [`It's not here.`] };
+      return {};
+    },
+    complete: (actor, command, game) => {
+      const output = [];
+      output.push(`You examine ${command.nounObject.name}.`);
+      const description = command.nounObject.description;
+      output.push(description || `You see nothing unusual.`);
+      return output;
+    }
   }
 ];
