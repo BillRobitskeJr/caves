@@ -1,41 +1,47 @@
-interface StatesDict {
+export interface EntityStatesDict {
   [key: string]: any;
 }
 
-interface EntityConfig {
-  states?: StatesDict;
+export interface EntityConfig {
+  states?: EntityStatesDict;
 }
 
-export default class Entity {
-  private states: StatesDict;
+export interface EntitySerlization {
+  states?: EntityStatesDict;
+}
+
+export default abstract class Entity {
+  private states: EntityStatesDict;
 
   constructor(config: EntityConfig = {}) {
-    config = config || {};
-    this.states = config.states || {};
+    this.states = {};
+
+    const states = config.states || {};
+    Object.keys(states).forEach(key => { this.states[key] = states[key]; });
   }
 
-  getState(key: string): any {
-    if (this.states.hasOwnProperty(key)) {
-      if (typeof this.states[key] === 'function') {
-        return this.states[key]();
-      } else {
-        return this.states[key];
-      }
-    }
-    return null;
+  public getState(key: string): any {
+    if (!this.states.hasOwnProperty(key)) return null;
+    return typeof this.states[key] === 'function' ? this.states[key].call(this) : this.states[key];
   }
 
-  setState(key: string, value: any): void {
+  public setState(key: string, value: any): void {
     this.states[key] = value;
   }
 
-  serialize(): StatesDict {
-    const states: StatesDict = {};
-    Object.keys(this.states).forEach(key => { if (typeof this.states[key] !== 'function') states[key] = this.states[key]; });
-    return states;
+  public serialize(): EntitySerlization {
+    const serialization: EntitySerlization = {};
+    const keys = Object.keys(this.states);
+    if (keys.length > 0) {
+      const states: EntityStatesDict = {};
+      keys.forEach(key => { if (typeof this.states[key] !== 'function') states[key] = this.states[key]; });
+      serialization.states = states;
+    }
+    return serialization;
   }
 
-  deserialize(states: StatesDict): void {
-    Object.keys(states).forEach(key => { this.setState(key, states[key]); });
+  public deserialize(serialization: EntitySerlization): void {
+    const states: EntityStatesDict = serialization.states || {};
+    Object.keys(states).forEach(key => { this.states[key] = states[key]; });
   }
 }
