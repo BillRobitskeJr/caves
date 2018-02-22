@@ -47,7 +47,7 @@ describe(`"The Quest" Example Game (BDD)`, function() {
     });
     it(`should display the title screen to the main display`, function() {
       expect(mainDisplay.didPrint).to.be.true;
-      expect(mainDisplay.display).to.equal(config.game.titleScreen.join('\n'));
+      expect(mainDisplay.display).to.equal(gameConfig.game.titleScreen.join('\n'));
     });
     it(`should clear the location status display`, function() {
       expect(locationDisplay.didClear).to.be.true;
