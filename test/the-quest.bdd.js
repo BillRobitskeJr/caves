@@ -104,4 +104,59 @@ describe(`"The Quest" Example Game (BDD)`, function() {
       });
     });
   });
+
+  describe(`when on the opening screens (to pages)`, function() {
+    describe(`when "Return is pressed" (on first page)`, function() {
+      const enterCommand = () => { game.handleInput(''); };
+      after(function() { resetFlags(); });
+      it(`should not throw an error`, function() {
+        expect(enterCommand).to.not.throw();
+      });
+      it(`should clear the main display`, function() {
+        expect(mainDisplay.didClear).to.be.true;
+      });
+      it(`should display the second page of the opening`, function() {
+        expect(mainDisplay.didPrint).to.be.true;
+        expect(mainDisplay.display.indexOf(gameConfig.game.openingScreens[1].join('\n'))).to.not.equal(-1);
+      });
+      it(`should prompt the player to press Return`, function() {
+        const lines = mainDisplay.displayLines.split(/\n/g);
+        expect(lines[lines.length - 1]).to.equal('Press Return to continue...');
+      });
+    });
+    describe(`when "Return is pressed" again (on last page)`, function() {
+      const enterCommand = () => { game.handleInput(''); }
+      after(function() { resetFlags(); });
+      it(`should not throw an error`, function() {
+        expect(enterCommand).to.not.throw();
+      });
+      it(`should clear the main display`, function() {
+        expect(mainDisplay.didClear).to.be.true;
+      });
+      it(`should display that the user is in the first room`, function() {
+        expect(mainDisplay.didPrint).to.be.true;
+        expect(mainDisplay.display.indexOf('You are in your living room.')).to.not.equal(-1);
+      });
+      it(`should display the room details in the location status display`, function() {
+        expect(locationDisplay.didClear).to.be.true;
+        expect(locationDisplay.didPrint).to.be.true;
+        expect(locationDisplay.display).to.equal(([
+          `You are in your living room.`,
+          `You can go: north, south, east`,
+          `You can see:`,
+          `   an old diary`,
+          `   a small box`
+        ]).join('\n'));
+      });
+      it(`should display the player's invnentory in the player status display`, function() {
+        expect(playerDisplay.didClear).to.be.true;
+        expect(playerDisplay.didPrint).to.be.true;
+        expect(playerDisplay.display).to.equal(([
+          `You are carrying:`,
+          `   nothing`,
+          `You can carry 5 more.`
+        ]).join('\n'));
+      });
+    });
+  });
 });
