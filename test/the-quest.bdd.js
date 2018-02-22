@@ -27,6 +27,11 @@ describe(`"The Quest" Example Game (BDD)`, function() {
   const mainDisplay = new TestingDisplay();
   const locationDisplay = new TestingDisplay();
   const playerDisplay = new TestingDisplay();
+  const resetFlags = () => {
+    mainDisplay.resetFlags();
+    locationDisplay.resetFlags();
+    playerDisplay.resetFlags();
+  };
 
   describe('when initializing game engine', function() {
     const initGame = () => { game = new CavesEngine({
@@ -35,12 +40,7 @@ describe(`"The Quest" Example Game (BDD)`, function() {
       player: playerDisplay
     }, gameConfig); };
 
-    after(function() {
-      mainDisplay.resetFlags();
-      locationDisplay.resetFlags();
-      playerDisplay.resetFlags();
-    });
-
+    after(function() { resetFlags(); });
     it(`should throw no errors`, function() {
       expect(initGame).to.not.throw();
       expect(game).to.be.an('object').that.is.an.instanceof(CavesEngine).and.is.not.null;
@@ -57,6 +57,51 @@ describe(`"The Quest" Example Game (BDD)`, function() {
     });
     it(`should expose a #handleInput method`, function() {
       expect(game).to.have.property('handleInput').that.is.a('function');
+    });
+  });
+
+  describe(`when on the title screen`, function() {
+    describe(`when no command is entered`, function() {
+      const enterCommand = () => { game.handleInput(''); }
+      after(function() { resetFlags(); });
+      it(`should not throw an error`, function() {
+        expect(enterCommand).to.not.throw();
+      });
+      it(`should display the title screen`, function() {
+        expect(mainDisplay.didClear).to.be.true;
+        expect(mainDisplay.didPrint).to.be.true;
+        expect(mainDisplay.display).to.equal(gameConfig.game.titleScreen.join('\n'));
+      });
+    });
+    describe(`when an invalid command is entered`, function() {
+      const enterCommand = () => { game.handleInput('invalid'); }
+      after(function() { resetFlags(); });
+      it(`should not throw an error`, function() {
+        expect(enterCommand).to.not.throw();
+      });
+      it(`should display the title screen`, function() {
+        expect(mainDisplay.didClear).to.be.true;
+        expect(mainDisplay.didPrint).to.be.true;
+        expect(mainDisplay.display).to.equal(gameConfig.game.titleScreen.join('\n'));
+      });
+    });
+    describe(`when "start" is entered`, function() {
+      const enterCommand = () => { game.handleInput('start'); }
+      after(function() { resetFlags(); });
+      it(`should not throw an error`, function() {
+        expect(enterCommand).to.not.throw();
+      });
+      it(`should clear the main display`, function() {
+        expect(mainDisplay.didClear).to.be.true;
+      });
+      it(`should display the first page of the opening`, function() {
+        expect(mainDisplay.didPrint).to.be.true;
+        expect(mainDisplay.display.indexOf(gameConfig.game.openingScreens[0].join('\n'))).to.not.equal(-1);
+      });
+      it(`should prompt the player to press Return`, function() {
+        const lines = mainDisplay.display.split(/\n/g);
+        expect(lines[lines.length - 1]).to.equal('Press Return to continue...');
+      });
     });
   });
 });
