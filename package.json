@@ -15,8 +15,9 @@
   },
   "scripts": {
     "start": "node ./localhost.js",
-    "test": "tsc && mocha",
+    "test": "npm run build-lib && mocha",
     "build": "webpack",
+    "build-lib": "tsc --p tsconfig.json && tsc --p tsconfig.the-quest.json",
     "watch": "webpack --watch"
   },
   "repository": {
