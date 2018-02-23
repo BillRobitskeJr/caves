@@ -18,4 +18,25 @@ export default class GameEntity extends Entity {
   public get titleScreen(): string[] { return this.getState('titleScreen'); }
 
   public get openingScreen(): string[] { return this.getState('openingScreens')[this.getState('openingPage')]; }
+
+  public get locationStatusScreen(): string[] {
+    const name = 'nowhere';
+    const exits = 'nowhere';
+    const contents = ['   nothing of interest'];
+    return ([
+      `You are ${name}.`,
+      `You can go: ${exits}`,
+      `You can see:`
+    ]).concat(contents);
+  }
+
+  public get playerStatusScreen(): string[] {
+    const inventory = ['   nothing'];
+    const remainingCarry = 0;
+    return ([
+      `You are carrying:`
+    ]).concat(inventory).concat([
+      `You can carry ${remainingCarry} more.`
+    ]);
+  }
 }

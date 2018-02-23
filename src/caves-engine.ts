@@ -52,6 +52,10 @@ export default class CavesEngine {
     switch(this.gameState) {
       case GameState.title:
         this.handleTitleInput(input);
+        break;
+      case GameState.opening:
+        this.handleOpeningInput(input);
+        break;
     }
   }
 
@@ -63,10 +67,27 @@ export default class CavesEngine {
     }
   }
 
+  private handleOpeningInput(input: string): void {
+    this.gameEntity.setState('openingPage', this.gameEntity.getState('openingPage') + 1);
+    if (this.gameEntity.openingScreen) {
+      this.displayOpeningScreen();
+    } else {
+      this.startPlaying();
+    }
+  }
+
   private startOpening(): void {
     this.gameState = GameState.opening;
     this.gameEntity.setState('openingPage', 0);
     this.displayOpeningScreen();
+  }
+  
+  private startPlaying(): void {
+    this.gameState = GameState.playing;
+    this.outputs.main.clear();
+    const locationName = 'nowhere';
+    this.outputs.main.print(`You are ${locationName}.`);
+    this.displayPlayingTurnStart();
   }
 
   private displayTitleScreen(): void {
@@ -82,5 +103,12 @@ export default class CavesEngine {
     this.outputs.main.print(`Press Return to continue...`);
     this.outputs.location.clear();
     this.outputs.player.clear();
+  }
+
+  private displayPlayingTurnStart(): void {
+    this.outputs.location.clear();
+    this.gameEntity.locationStatusScreen.forEach(line => { this.outputs.location.print(line); });
+    this.outputs.player.clear();
+    this.gameEntity.playerStatusScreen.forEach(line => { this.outputs.player.print(line); });
   }
 }
