@@ -1,5 +1,7 @@
 import GameEntity from './game-entity';
 import { GameEntityConfig } from './game-entity';
+import PlayerEntity from './player-entity';
+import { PlayerEntityConfig } from './player-entity';
 
 export interface OutputPrintFunc {
   (message: string): void;
@@ -22,6 +24,7 @@ export interface OutputsDict {
 
 export interface GameConfig {
   game?: GameEntityConfig;
+  player?: PlayerEntityConfig;
 }
 
 export enum GameState {
@@ -84,6 +87,7 @@ export default class CavesEngine {
   
   private startPlaying(): void {
     this.gameState = GameState.playing;
+    this.gameEntity.player = new PlayerEntity(this.config.player || {}, this.gameEntity);
     this.outputs.main.clear();
     const locationName = 'nowhere';
     this.outputs.main.print(`You are ${locationName}.`);

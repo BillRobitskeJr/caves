@@ -1,5 +1,6 @@
 import Entity from './entity';
 import { EntityConfig } from './entity';
+import PlayerEntity from './player-entity';
 
 export interface GameEntityConfig extends EntityConfig {
   titleScreen?: string[];
@@ -7,6 +8,8 @@ export interface GameEntityConfig extends EntityConfig {
 }
 
 export default class GameEntity extends Entity {
+  private playerEntity: PlayerEntity;
+
   constructor(config: GameEntityConfig) {
     super(config);
     this.setState('titleScreen', config.titleScreen || ['']);
@@ -14,6 +17,9 @@ export default class GameEntity extends Entity {
 
     this.setState('openingPage', 0);
   }
+
+  public get player(): PlayerEntity { return this.playerEntity; }
+  public set player(playerEntity: PlayerEntity) { this.playerEntity = playerEntity; }
 
   public get titleScreen(): string[] { return this.getState('titleScreen'); }
 
