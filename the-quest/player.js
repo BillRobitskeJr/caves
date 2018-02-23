@@ -6,5 +6,6 @@
  */
 
 export default {
-  maxCarry: 5
+  maxCarry: 5,
+  location: 1
 }
