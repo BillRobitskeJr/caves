@@ -2,6 +2,11 @@ import GameEntity from './game-entity';
 import { GameEntityConfig } from './game-entity';
 import PlayerEntity from './player-entity';
 import { PlayerEntityConfig } from './player-entity';
+import LocationEntity from './location-entity';
+import { LocationEntityConfig } from './location-entity';
+import ObjectEntity from './object-entity';
+import { ObjectEntityConfig } from './object-entity';
+import Collection from './collection';
 
 export interface OutputPrintFunc {
   (message: string): void;
@@ -25,6 +30,8 @@ export interface OutputsDict {
 export interface GameConfig {
   game?: GameEntityConfig;
   player?: PlayerEntityConfig;
+  locations?: LocationEntityConfig[];
+  objects?: ObjectEntityConfig[];
 }
 
 export enum GameState {
@@ -88,9 +95,11 @@ export default class CavesEngine {
   private startPlaying(): void {
     this.gameState = GameState.playing;
     this.gameEntity.player = new PlayerEntity(this.config.player || {}, this.gameEntity);
+    this.gameEntity.locations = new Collection<LocationEntity>((this.config.locations || []).map(config => new LocationEntity(config, this.gameEntity)));
+    this.gameEntity.objects = new Collection<ObjectEntity>((this.config.objects || []).map(config => new ObjectEntity(config, this.gameEntity)));
     this.outputs.main.clear();
-    const locationName = 'nowhere';
-    this.outputs.main.print(`You are ${locationName}.`);
+    const location = (this.gameEntity.player.location || {name: 'nowhere'});
+    this.outputs.main.print(`You are ${location.name}.`);
     this.displayPlayingTurnStart();
   }
 
