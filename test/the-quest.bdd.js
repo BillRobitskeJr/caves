@@ -326,4 +326,225 @@ describe(`"The Quest" Example Game (BDD)`, function() {
       });
     });
   });
+
+  describe(`when playing through the game`, function() {
+    before(function() {
+      game.handleInput('start');
+      game.handleInput('');
+      game.handleInput('');
+    });
+    describe(`when "go south" is entered`, function() {
+      const enterCommand = () => { game.handleInput('go south'); };
+      after(function() {
+        resetFlags();
+      });
+      it(`should not throw any errors`, function() {
+        expect(enterCommand).to.not.throw();
+      });
+      it(`should display "You are in the library." in the main display`, function() {
+        const lines = mainDisplay.display.split(/\n/g);
+        expect(lines[lines.length - 1]).to.equal('You are in the library.');
+      });
+      it(`should update the location status display`, function() {
+        expect(locationDisplay.didClear).to.be.true;
+        expect(locationDisplay.display).to.equal(([
+          `You are in the library.`,
+          `You can go: north`,
+          `You can see:`,
+          `   a dictionary`
+        ]).join('\n'));
+      });
+      it(`should update the player status display`, function() {
+        expect(playerDisplay.didClear).to.be.true;
+        expect(playerDisplay.display).to.equal(([
+          `You are carrying:`,
+          `   nothing`,
+          `You can carry 5 more.`
+        ]).join('\n'));
+      });
+    });
+    describe(`when "go north" is entered`, function() {
+      const enterCommand = () => { game.handleInput('go north'); };
+      after(function() {
+        resetFlags();
+      });
+      it(`should not throw any errors`, function() {
+        expect(enterCommand).to.not.throw();
+      });
+      it(`should display "You are in your living room." in the main display`, function() {
+        const lines = mainDisplay.display.split(/\n/g);
+        expect(lines[lines.length - 1]).to.equal('You are in your living room.');
+      });
+      it(`should update the location status display`, function() {
+        expect(locationDisplay.didClear).to.be.true;
+        expect(locationDisplay.display).to.equal(([
+          `You are in your living room.`,
+          `You can go: north, south, east`,
+          `You can see:`,
+          `   an old diary`,
+          `   a small box`
+        ]).join('\n'));
+      });
+      it(`should update the player status display`, function() {
+        expect(playerDisplay.didClear).to.be.true;
+        expect(playerDisplay.display).to.equal(([
+          `You are carrying:`,
+          `   nothing`,
+          `You can carry 5 more.`
+        ]).join('\n'));
+      });
+    });
+    describe(`when "go east" is entered`, function() {
+      const enterCommand = () => { game.handleInput('go east'); };
+      after(function() {
+        resetFlags();
+      });
+      it(`should not throw any errors`, function() {
+        expect(enterCommand).to.not.throw();
+      });
+      it(`should display "You are in the kitchen." in the main display`, function() {
+        const lines = mainDisplay.display.split(/\n/g);
+        expect(lines[lines.length - 1]).to.equal('You are in the kitchen.');
+      });
+      it(`should update the location status display`, function() {
+        expect(locationDisplay.didClear).to.be.true;
+        expect(locationDisplay.display).to.equal(([
+          `You are in the kitchen.`,
+          `You can go: west`,
+          `You can see:`,
+          `   cabinet`
+        ]).join('\n'));
+      });
+      it(`should update the player status display`, function() {
+        expect(playerDisplay.didClear).to.be.true;
+        expect(playerDisplay.display).to.equal(([
+          `You are carrying:`,
+          `   nothing`,
+          `You can carry 5 more.`
+        ]).join('\n'));
+      });
+    });
+    describe(`when "go west" is entered`, function() {
+      const enterCommand = () => { game.handleInput('go west'); };
+      after(function() {
+        resetFlags();
+      });
+      it(`should not throw any errors`, function() {
+        expect(enterCommand).to.not.throw();
+      });
+      it(`should display "You are in your living room." in the main display`, function() {
+        const lines = mainDisplay.display.split(/\n/g);
+        expect(lines[lines.length - 1]).to.equal('You are in your living room.');
+      });
+      it(`should update the location status display`, function() {
+        expect(locationDisplay.didClear).to.be.true;
+        expect(locationDisplay.display).to.equal(([
+          `You are in your living room.`,
+          `You can go: north, south, east`,
+          `You can see:`,
+          `   an old diary`,
+          `   a small box`
+        ]).join('\n'));
+      });
+      it(`should update the player status display`, function() {
+        expect(playerDisplay.didClear).to.be.true;
+        expect(playerDisplay.display).to.equal(([
+          `You are carrying:`,
+          `   nothing`,
+          `You can carry 5 more.`
+        ]).join('\n'));
+      });
+    });
+    describe(`when "go north" is entered`, function() {
+      const enterCommand = () => { game.handleInput('go north'); };
+      after(function() {
+        resetFlags();
+      });
+      it(`should not throw any errors`, function() {
+        expect(enterCommand).to.not.throw();
+      });
+      it(`should display "You are in the front yard." in the main display`, function() {
+        const lines = mainDisplay.display.split(/\n/g);
+        expect(lines[lines.length - 1]).to.equal('You are in the front yard.');
+      });
+      it(`should update the location status display`, function() {
+        expect(locationDisplay.didClear).to.be.true;
+        expect(locationDisplay.display).to.equal(([
+          `You are in the front yard.`,
+          `You can go: south, west`,
+          `You can see:`,
+          `  wooden barrel`
+        ]).join('\n'));
+      });
+      it(`should update the player status display`, function() {
+        expect(playerDisplay.didClear).to.be.true;
+        expect(playerDisplay.display).to.equal(([
+          `You are carrying:`,
+          `   nothing`,
+          `You can carry 5 more.`
+        ]).join('\n'));
+      });
+    });
+    describe(`when "go west" is entered`, function() {
+      const enterCommand = () => { game.handleInput('go west'); };
+      after(function() {
+        resetFlags();
+      });
+      it(`should not throw any errors`, function() {
+        expect(enterCommand).to.not.throw();
+      });
+      it(`should display "You are in the garage." in the main display`, function() {
+        const lines = mainDisplay.display.split(/\n/g);
+        expect(lines[lines.length - 1]).to.equal('You are in the garage.');
+      });
+      it(`should update the location status display`, function() {
+        expect(locationDisplay.didClear).to.be.true;
+        expect(locationDisplay.display).to.equal(([
+          `You are in the garage.`,
+          `You can go: east`,
+          `You can see:`,
+          `   a ladder`,
+          `   a shovel`
+        ]).join('\n'));
+      });
+      it(`should update the player status display`, function() {
+        expect(playerDisplay.didClear).to.be.true;
+        expect(playerDisplay.display).to.equal(([
+          `You are carrying:`,
+          `   nothing`,
+          `You can carry 5 more.`
+        ]).join('\n'));
+      });
+    });
+    describe(`when "go east" is entered`, function() {
+      const enterCommand = () => { game.handleInput('go east'); };
+      after(function() {
+        resetFlags();
+      });
+      it(`should not throw any errors`, function() {
+        expect(enterCommand).to.not.throw();
+      });
+      it(`should display "You are in the front yard." in the main display`, function() {
+        const lines = mainDisplay.display.split(/\n/g);
+        expect(lines[lines.length - 1]).to.equal('You are in the front yard.');
+      });
+      it(`should update the location status display`, function() {
+        expect(locationDisplay.didClear).to.be.true;
+        expect(locationDisplay.display).to.equal(([
+          `You are in the front yard.`,
+          `You can go: south, west`,
+          `You can see:`,
+          `   wooden barrel`
+        ]).join('\n'));
+      });
+      it(`should update the player status display`, function() {
+        expect(playerDisplay.didClear).to.be.true;
+        expect(playerDisplay.display).to.equal(([
+          `You are carrying:`,
+          `   nothing`,
+          `You can carry 5 more.`
+        ]).join('\n'));
+      });
+    });
+  });
 });
