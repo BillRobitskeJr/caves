@@ -61,16 +61,19 @@ export default class CavesEngine {
   public handleInput(input: string): void {
     switch(this.gameState) {
       case GameState.title:
-        this.handleTitleInput(input);
+        this.handleTitleInput(input.trim());
         break;
       case GameState.opening:
-        this.handleOpeningInput(input);
+        this.handleOpeningInput(input.trim());
+        break;
+      case GameState.playing:
+        this.handlePlayingInput(input.trim());
         break;
     }
   }
 
   private handleTitleInput(input: string): void {
-    if (input.trim().match(/^start$/i)) {
+    if (input.match(/^start$/i)) {
       this.startOpening();
     } else {
       this.displayTitleScreen();
@@ -84,6 +87,29 @@ export default class CavesEngine {
     } else {
       this.startPlaying();
     }
+  }
+
+  private handlePlayingInput(input: string): void {
+    if (this.gameEntity.getState('isQuitting')) {
+      if (input.match(/^y(es)?$/i)) {
+        this.gameEntity.setState('isQuitting', false);
+        this.gameState = GameState.title;
+        this.displayTitleScreen();
+      } else if (input.match(/^n(o)?$/i)) {
+        this.gameEntity.setState('isQuitting', false);
+        const location = this.gameEntity.player.location;
+        const locationName = location ? location.name : 'nowhere';
+        this.outputs.main.print(`You are ${locationName}.`);
+      } else {
+        this.displayPlayingQuitPrompt();
+      }
+    } else if (input.match(/^quit$/i)) {
+      this.gameEntity.setState('isQuitting', true);
+      this.displayPlayingQuitPrompt();
+    } else if (input) {
+      this.outputs.main.print(`You don't know how to do that.`);
+    }
+    if (this.gameState === GameState.playing && !this.gameEntity.getState('isQuitting')) this.displayPlayingTurnStart();
   }
 
   private startOpening(): void {
@@ -123,5 +149,9 @@ export default class CavesEngine {
     this.gameEntity.locationStatusScreen.forEach(line => { this.outputs.location.print(line); });
     this.outputs.player.clear();
     this.gameEntity.playerStatusScreen.forEach(line => { this.outputs.player.print(line); });
+  }
+
+  private displayPlayingQuitPrompt(): void {
+    this.outputs.main.print(`Do you want to quit? (Yes/no)`);
   }
 }

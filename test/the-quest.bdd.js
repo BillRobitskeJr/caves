@@ -147,4 +147,183 @@ describe(`"The Quest" Example Game (BDD)`, function() {
       });
     });
   });
+
+  describe(`when playing the game`, function() {
+    describe(`when no command is entered`, function() {
+      const enterCommand = () => { game.handleInput(''); };
+      after(function() {
+        resetFlags();
+      });
+      it(`should not throw an error`, function() {
+        expect(enterCommand).to.not.throw();
+      });
+      it(`should not clear the display`, function() {
+        expect(mainDisplay.didClear).to.be.false;
+      });
+      it(`should not print anything`, function() {
+        expect(mainDisplay.didPrint).to.be.false;
+      });
+      it(`should update the location status display`, function() {
+        expect(locationDisplay.didClear).to.be.true;
+        expect(locationDisplay.display).to.equal(([
+          `You are in your living room.`,
+          `You can go: north, south, east`,
+          `You can see:`,
+          `   an old diary`,
+          `   a small box`
+        ]).join('\n'));
+      });
+      it(`should update the player status display`, function() {
+        expect(playerDisplay.didClear).to.be.true;
+        expect(playerDisplay.display).to.equal(([
+          `You are carrying:`,
+          `   nothing`,
+          `You can carry 5 more.`
+        ]).join('\n'));
+      });
+    });
+    describe(`when an invalid command is entered`, function() {
+      const enterCommand = () => { game.handleInput('invalid'); };
+      after(function() {
+        resetFlags();
+      });
+      it(`should not throw an error`, function() {
+        expect(enterCommand).to.not.throw();
+      });
+      it(`should not clear the display`, function() {
+        expect(mainDisplay.didClear).to.be.false;
+      });
+      it(`should display "You don't know how to do that."`, function() {
+        const lines = mainDisplay.display.split(/\n/g);
+        expect(lines[lines.length - 1]).to.equal(`You don't know how to do that.`);
+      });
+      it(`should update the location status display`, function() {
+        expect(locationDisplay.didClear).to.be.true;
+        expect(locationDisplay.display).to.equal(([
+          `You are in your living room.`,
+          `You can go: north, south, east`,
+          `You can see:`,
+          `   an old diary`,
+          `   a small box`
+        ]).join('\n'));
+      });
+      it(`should update the player status display`, function() {
+        expect(playerDisplay.didClear).to.be.true;
+        expect(playerDisplay.display).to.equal(([
+          `You are carrying:`,
+          `   nothing`,
+          `You can carry 5 more.`
+        ]).join('\n'));
+      });
+    });
+    describe(`when "quit" is entered`, function() {
+      const enterCommand = () => { game.handleInput('quit'); };
+      after(function() {
+        resetFlags();
+      });
+      it(`should not throw an error`, function() {
+        expect(enterCommand).to.not.throw();
+      });
+      it(`should not clear the display`, function() {
+        expect(mainDisplay.didClear).to.be.false;
+      });
+      it(`should prompt the user "Do you want to quit? (Yes/no)"`, function() {
+        const lines = mainDisplay.display.split(/\n/g);
+        expect(lines[lines.length - 1]).to.equal(`Do you want to quit? (Yes/no)`);
+      });
+      it(`should not change the location status display`, function() {
+        expect(locationDisplay.didClear).to.be.false;
+        expect(locationDisplay.didPrint).to.be.false;
+      });
+      it(`should not change the player status display`, function() {
+        expect(playerDisplay.didClear).to.be.false;
+        expect(playerDisplay.didPrint).to.be.false;
+      });
+    });
+    describe(`when "no" is entered after "quit"`, function() {
+      const enterCommand = () => { game.handleInput('no'); };
+      after(function() {
+        resetFlags();
+      });
+      it(`should not throw an error`, function() {
+        expect(enterCommand).to.not.throw();
+      });
+      it(`should not clear the display`, function() {
+        expect(mainDisplay.didClear).to.be.false;
+      });
+      it(`should display the room the player is in`, function() {
+        const lines = mainDisplay.display.split(/\n/g);
+        expect(lines[lines.length - 1]).to.equal(`You are in your living room.`);
+      });
+      it(`should update the location status display`, function() {
+        expect(locationDisplay.didClear).to.be.true;
+        expect(locationDisplay.display).to.equal(([
+          `You are in your living room.`,
+          `You can go: north, south, east`,
+          `You can see:`,
+          `   an old diary`,
+          `   a small box`
+        ]).join('\n'));
+      });
+      it(`should update the player status display`, function() {
+        expect(playerDisplay.didClear).to.be.true;
+        expect(playerDisplay.display).to.equal(([
+          `You are carrying:`,
+          `   nothing`,
+          `You can carry 5 more.`
+        ]).join('\n'));
+      });
+    });
+    describe(`when neither "yes" nor "no" is entered after "quit"`, function() {
+      const enterCommand = () => { game.handleInput('maybe?'); };
+      before(function() {
+        game.handleInput('quit');
+      });
+      after(function() {
+        resetFlags();
+      });
+      it(`should not throw an error`, function() {
+        expect(enterCommand).to.not.throw();
+      });
+      it(`should not clear the display`, function() {
+        expect(mainDisplay.didClear).to.be.false;
+      });
+      it(`should reprompt the user`, function() {
+        const lines = mainDisplay.display.split(/\n/g);
+        expect(lines[lines.length - 1]).to.equal(`Do you want to quit? (Yes/no)`);
+        expect(lines[lines.length - 2]).to.equal(`Do you want to quit? (Yes/no)`);
+      });
+      it(`should not change the location status display`, function() {
+        expect(locationDisplay.didClear).to.be.false;
+        expect(locationDisplay.didPrint).to.be.false;
+      });
+      it(`should not change the player status display`, function() {
+        expect(playerDisplay.didClear).to.be.false;
+        expect(playerDisplay.didPrint).to.be.false;
+      });
+    });
+    describe(`when "yes" is entered after "quit"`, function() {
+      const enterCommand = () => { game.handleInput('yes'); };
+      after(function() {
+        resetFlags();
+      });
+      it(`should not throw an error`, function() {
+        expect(enterCommand).to.not.throw();
+      });
+      it(`should clear the display`, function() {
+        expect(mainDisplay.didClear).to.be.true;
+      });
+      it(`should display the title screen`, function() {
+        expect(mainDisplay.display).to.equal(gameConfig.game.titleScreen.join('\n'));
+      });
+      it(`should clear the location status display`, function() {
+        expect(locationDisplay.didClear).to.be.true;
+        expect(locationDisplay.didPrint).to.be.false;
+      });
+      it(`should clear the player status display`, function() {
+        expect(playerDisplay.didClear).to.be.true;
+        expect(playerDisplay.didPrint).to.be.false;
+      });
+    });
+  });
 });
