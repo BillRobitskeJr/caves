@@ -7,6 +7,7 @@ import { LocationEntityConfig } from './location-entity';
 import ObjectEntity from './object-entity';
 import { ObjectEntityConfig } from './object-entity';
 import Collection from './collection';
+import Command from './command';
 
 export interface OutputPrintFunc {
   (message: string): void;
@@ -107,6 +108,7 @@ export default class CavesEngine {
       this.gameEntity.setState('isQuitting', true);
       this.displayPlayingQuitPrompt();
     } else if (input) {
+      const command = Command.parse(input, this.gameEntity);
       this.outputs.main.print(`You don't know how to do that.`);
     }
     if (this.gameState === GameState.playing && !this.gameEntity.getState('isQuitting')) this.displayPlayingTurnStart();
