@@ -109,7 +109,13 @@ export default class CavesEngine {
       this.displayPlayingQuitPrompt();
     } else if (input) {
       const command = Command.parse(input, this.gameEntity);
-      this.outputs.main.print(`You don't know how to do that.`);
+      const behavior = this.gameEntity.player.getBehaviorForCommand(command);
+      if (behavior) {
+        const output = behavior();
+        output.forEach(line => { this.outputs.main.print(line); });
+      } else {
+        this.outputs.main.print(`You don't know how to do that.`);
+      }
     }
     if (this.gameState === GameState.playing && !this.gameEntity.getState('isQuitting')) this.displayPlayingTurnStart();
   }
