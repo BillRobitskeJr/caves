@@ -11,7 +11,7 @@ export default [
   { id: 3, name: 'cabinet', tags: ['cabinet'], location: 2 },
   { id: 4, name: 'a salt shaker', tags: ['salt', 'shaker'] },
   { id: 5, name: 'a dictionary', tags: ['dictionary'], location: 3 },
-  { id: 6, name: 'wooden barrel', tags: ['barrel'], locations: 4 },
+  { id: 6, name: 'wooden barrel', tags: ['barrel'], location: 4 },
   { id: 7, name: 'a small bottle', tags: ['bottle', 'formula'] },
   { id: 8, name: 'a ladder', tags: ['ladder'], location: 5 },
   { id: 9, name: 'a shovel', tags: ['shovel'], location: 5 },

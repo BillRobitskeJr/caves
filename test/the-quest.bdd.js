@@ -473,7 +473,7 @@ describe(`"The Quest" Example Game (BDD)`, function() {
           `You are in the front yard.`,
           `You can go: south, west`,
           `You can see:`,
-          `  wooden barrel`
+          `   wooden barrel`
         ]).join('\n'));
       });
       it(`should update the player status display`, function() {
