@@ -28,6 +28,13 @@ export default class ObjectEntity extends Entity {
   public get name(): string { return this.getState('name'); }
 
   public get location(): LocationEntity|null {
-    return null;
+    return this.gameEntity.locations.findOne(location => location.id === this.getState('location'));
+  }
+  public set location(value: LocationEntity|null) {
+    this.setState('location', value ? value.id : null);
+  }
+
+  public get nounExpression(): RegExp {
+    return new RegExp(`(${this.getState('tags').join('|')})`, 'gi');
   }
 }

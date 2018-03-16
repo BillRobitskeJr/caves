@@ -363,6 +363,34 @@ describe(`"The Quest" Example Game (BDD)`, function() {
         ]).join('\n'));
       });
     });
+    describe(`when "get dictionary" is entered`, function() {
+      const enterCommand = () => { game.handleInput('get dictionary'); };
+      after(function() { resetFlags(); });
+      it(`should not throw any errors`, function() {
+        expect(enterCommand).to.not.throw();
+      });
+      it(`should display "You pick up a dictionary." in the main display`, function() {
+        const lines = mainDisplay.display.split(/\n/g);
+        expect(lines[lines.length - 1]).to.equal('You pick up a dictionary.');
+      });
+      it(`should update the location status display`, function() {
+        expect(locationDisplay.didClear).to.be.true;
+        expect(locationDisplay.display).to.equal(([
+          `You are in the library.`,
+          `You can go: north`,
+          `You can see:`,
+          `   nothing of interest`
+        ]).join('\n'));
+      });
+      it(`should update the player status display`, function() {
+        expect(playerDisplay.didClear).to.be.true;
+        expect(playerDisplay.display).to.equal(([
+          `You are carrying:`,
+          `   a dictionary`,
+          `You can carry 4 more.`
+        ]).join('\n'));
+      });
+    });
     describe(`when "go north" is entered`, function() {
       const enterCommand = () => { game.handleInput('go north'); };
       after(function() {
@@ -389,8 +417,8 @@ describe(`"The Quest" Example Game (BDD)`, function() {
         expect(playerDisplay.didClear).to.be.true;
         expect(playerDisplay.display).to.equal(([
           `You are carrying:`,
-          `   nothing`,
-          `You can carry 5 more.`
+          `   a dictionary`,
+          `You can carry 4 more.`
         ]).join('\n'));
       });
     });
@@ -419,8 +447,8 @@ describe(`"The Quest" Example Game (BDD)`, function() {
         expect(playerDisplay.didClear).to.be.true;
         expect(playerDisplay.display).to.equal(([
           `You are carrying:`,
-          `   nothing`,
-          `You can carry 5 more.`
+          `   a dictionary`,
+          `You can carry 4 more.`
         ]).join('\n'));
       });
     });
@@ -450,8 +478,8 @@ describe(`"The Quest" Example Game (BDD)`, function() {
         expect(playerDisplay.didClear).to.be.true;
         expect(playerDisplay.display).to.equal(([
           `You are carrying:`,
-          `   nothing`,
-          `You can carry 5 more.`
+          `   a dictionary`,
+          `You can carry 4 more.`
         ]).join('\n'));
       });
     });
@@ -480,8 +508,8 @@ describe(`"The Quest" Example Game (BDD)`, function() {
         expect(playerDisplay.didClear).to.be.true;
         expect(playerDisplay.display).to.equal(([
           `You are carrying:`,
-          `   nothing`,
-          `You can carry 5 more.`
+          `   a dictionary`,
+          `You can carry 4 more.`
         ]).join('\n'));
       });
     });
@@ -511,8 +539,67 @@ describe(`"The Quest" Example Game (BDD)`, function() {
         expect(playerDisplay.didClear).to.be.true;
         expect(playerDisplay.display).to.equal(([
           `You are carrying:`,
-          `   nothing`,
-          `You can carry 5 more.`
+          `   a dictionary`,
+          `You can carry 4 more.`
+        ]).join('\n'));
+      });
+    });
+    describe(`when "take ladder" is entered`, function() {
+      const enterCommand = () => { game.handleInput('take ladder'); };
+      after(function() { resetFlags(); });
+      it(`should not throw any errors`, function() {
+        expect(enterCommand).to.not.throw();
+      });
+      it(`should display "You pick up a ladder." in the main display`, function() {
+        const lines = mainDisplay.display.split(/\n/g);
+        expect(lines[lines.length - 1]).to.equal('You pick up a ladder.');
+      });
+      it(`should update the location status display`, function() {
+        expect(locationDisplay.didClear).to.be.true;
+        expect(locationDisplay.display).to.equal(([
+          `You are in the garage.`,
+          `You can go: east`,
+          `You can see:`,
+          `   a shovel`
+        ]).join('\n'));
+      });
+      it(`should update the player status display`, function() {
+        expect(playerDisplay.didClear).to.be.true;
+        expect(playerDisplay.display).to.equal(([
+          `You are carrying:`,
+          `   a dictionary`,
+          `   a ladder`,
+          `You can carry 3 more.`
+        ]).join('\n'));
+      });
+    });
+    describe(`when "get shovel" is entered`, function() {
+      const enterCommand = () => { game.handleInput('get shovel'); };
+      after(function() { resetFlags(); });
+      it(`should not throw any errors`, function() {
+        expect(enterCommand).to.not.throw();
+      });
+      it(`should display "You pick up a shovel." in the main display`, function() {
+        const lines = mainDisplay.display.split(/\n/g);
+        expect(lines[lines.length - 1]).to.equal('You pick up a shovel.');
+      });
+      it(`should update the location status display`, function() {
+        expect(locationDisplay.didClear).to.be.true;
+        expect(locationDisplay.display).to.equal(([
+          `You are in the garage.`,
+          `You can go: east`,
+          `You can see:`,
+          `   nothing of interest`
+        ]).join('\n'));
+      });
+      it(`should update the player status display`, function() {
+        expect(playerDisplay.didClear).to.be.true;
+        expect(playerDisplay.display).to.equal(([
+          `You are carrying:`,
+          `   a dictionary`,
+          `   a ladder`,
+          `   a shovel`,
+          `You can carry 2 more.`
         ]).join('\n'));
       });
     });
@@ -541,8 +628,10 @@ describe(`"The Quest" Example Game (BDD)`, function() {
         expect(playerDisplay.didClear).to.be.true;
         expect(playerDisplay.display).to.equal(([
           `You are carrying:`,
-          `   nothing`,
-          `You can carry 5 more.`
+          `   a dictionary`,
+          `   a ladder`,
+          `   a shovel`,
+          `You can carry 2 more.`
         ]).join('\n'));
       });
     });

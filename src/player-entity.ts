@@ -38,9 +38,16 @@ export default class PlayerEntity extends Entity {
 
     this.setState('maxCarry', config.maxCarry || 0);
     this.setState('location', config.location || 1);
+    this.setState('inventory', []);
   }
 
-  public get inventory(): ObjectEntity[] { return []; }
+  public get inventory(): ObjectEntity[] {
+    const inventory = this.getState('inventory');
+    return this.gameEntity.objects.findAll(object => inventory.indexOf(object.id) !== -1);
+  }
+  public set inventory(value: ObjectEntity[]) {
+    this.setState('inventory', value.map(object => object.id));
+  }
 
   public get location(): LocationEntity|null {
     return this.gameEntity.locations.findOne(location => location.id === this.getState('location'));
@@ -56,7 +63,11 @@ export default class PlayerEntity extends Entity {
 
   public static get defaultBehaviorMappings(): BehaviorMapping[] {
     return [
-      { verbExpression: /^go$/i, behaviorKey: 'move', behaviorPropertyMapper: (command, self) => [command.nounPhrase, self] }
+      { verbExpression: /^go$/i, behaviorKey: 'move', behaviorPropertyMapper: (command, self) => [command.nounPhrase, self] },
+      { verbExpression: /^(get|take)$/i, behaviorKey: 'get', behaviorPropertyMapper: (command, self) => {
+        const object = self.gameEntity.objects.findOne(object => object.nounExpression.test(command.nounPhrase) && (object.location === self.location || self.inventory.indexOf(object) !== -1));
+        return [object, self];
+      } }
     ];
   }
 
@@ -72,6 +83,15 @@ export default class PlayerEntity extends Entity {
           `You head ${direction}.`,
           `You are ${location.name}.`
         ];
+      },
+      get: (object: ObjectEntity|null, self: PlayerEntity): string[] => {
+        if (!object) return [`You can't get that.`];
+        if (self.inventory.indexOf(object) !== -1) return [`You are already carrying ${object.name}.`];
+        object.location = null;
+        const inventory = self.inventory;
+        inventory.push(object);
+        self.inventory = inventory;
+        return [`You pick up ${object.name}.`];
       }
     }
   }
